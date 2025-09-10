@@ -74,6 +74,16 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
+				"pulse-dot": {
+					"0%, 100%": {
+						transform: "scale(1)",
+						opacity: "1",
+					},
+					"50%": {
+						transform: "scale(0.8)",
+						opacity: "0.5",
+					},
+				},
 				'accordion-down': {
 					from: {
 						height: '0'
@@ -92,6 +102,9 @@ export default {
 				}
 			},
 			animation: {
+				"pulse-dot-1": "pulse-dot 1.5s infinite",
+				"pulse-dot-2": "pulse-dot 1.5s infinite 0.2s",
+				"pulse-dot-3": "pulse-dot 1.5s infinite 0.4s",
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
 			}

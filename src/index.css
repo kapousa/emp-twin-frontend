@@ -107,3 +107,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .dot {
+    @apply w-2 h-2 bg-muted-foreground rounded-full;
+  }
+}
