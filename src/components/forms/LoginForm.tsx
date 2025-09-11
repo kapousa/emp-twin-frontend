@@ -5,6 +5,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import axios from "axios";
+import { USER_LOGIN_ENDPOINT } from "@/configurations/api";
+import { useAuth } from "@/contexts/AuthProvider";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -12,10 +15,10 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!email || !password) {
       toast({
         title: "Missing credentials",
@@ -24,61 +27,40 @@ const LoginForm = () => {
       });
       return;
     }
-
     setIsLoading(true);
-
     try {
-      // Check for demo credentials first
-      if (email === "admin@demo.com" && password === "demo123") {
-        const demoToken = "demo_token_" + Date.now();
-        localStorage.setItem('admin_token', demoToken);
-        
-        toast({
-          title: "Login successful (Demo Mode)",
-          description: "Welcome to the FranchiseGPT demo!",
-        });
-        
-        navigate('/admin/dashboard');
-        return;
-      }
-
-      // Try actual API call for production
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.access_token) {
-          localStorage.setItem('admin_token', result.access_token);
-          
-          toast({
-            title: "Login successful",
-            description: "Welcome back, admin!",
-          });
-          
-          navigate('/admin/dashboard');
-          return;
+      const response = await axios.post(
+        USER_LOGIN_ENDPOINT,
+        new URLSearchParams({
+          username: email,
+          password: password,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         }
-      }
-      
-      throw new Error('Invalid credentials or server unavailable');
-      
-    } catch (error) {
-      if (error instanceof TypeError || error.message.includes('Failed to fetch')) {
+      );
+      if (response.status === 200) {
+        const { access_token } = response.data;
+        login(access_token);
         toast({
-          title: "API Unavailable - Demo Mode",
-          description: "Use demo credentials: admin@demo.com / demo123",
+          title: "Login successful",
+          description: "Welcome back, admin!",
+        });
+        navigate('/admin/dashboard');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast({
+          title: "Login failed",
+          description: error.response.data.detail || "Please check your credentials and try again.",
           variant: "destructive",
         });
       } else {
         toast({
           title: "Login failed",
-          description: "Please check your credentials and try again.",
+          description: "An unexpected error occurred. Please try again later.",
           variant: "destructive",
         });
       }
@@ -101,7 +83,6 @@ const LoginForm = () => {
           required
         />
       </div>
-      
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <Input
@@ -114,7 +95,6 @@ const LoginForm = () => {
           required
         />
       </div>
-
       <Button 
         type="submit" 
         disabled={isLoading}
