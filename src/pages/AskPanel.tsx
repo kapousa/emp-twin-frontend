@@ -11,6 +11,8 @@ import ReactMarkdown from "react-markdown";
 import { useDropzone } from "react-dropzone";
 import { useToast } from "@/hooks/use-toast";
 import { AGENT_ASK_ENDPOINT } from "@/configurations/api";
+import { useAuth } from "@/contexts/AuthProvider";
+
 
 const AGENT_ASK_ENDPOINT_CONST = AGENT_ASK_ENDPOINT;
 
@@ -88,6 +90,9 @@ const AskPanel = () => {
   const { toast } = useToast();
   const messagesEndRef = useRef(null);
 
+  const { token } = useAuth();
+
+
   const tips = [
     { text: "Be specific about your business context and goals" },
     { text: "Include relevant financial data or market information" },
@@ -146,7 +151,9 @@ const AskPanel = () => {
       formData.append('save', 'true');
 
       const response = await axios.post(AGENT_ASK_ENDPOINT_CONST, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+         },
       });
 
       const result = response.data;

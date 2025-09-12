@@ -8,11 +8,11 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("authToken") || null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const verifyAuth = async () => {
-      const token = localStorage.getItem("authToken");
       if (!token) {
         setIsAuthenticated(false);
         setUser(null);
@@ -21,9 +21,7 @@ export const AuthProvider = ({ children }) => {
       }
       try {
         await axios.get(AUTH_VERIFY_ENDPOINT, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
+          headers: { "Authorization": `Bearer ${token}` },
         });
         const decodedToken = jwtDecode(token);
         setUser({ email: decodedToken.email });
@@ -31,6 +29,7 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error("Authentication check failed:", error);
         localStorage.removeItem("authToken");
+        setToken(null);
         setIsAuthenticated(false);
         setUser(null);
       } finally {
@@ -39,23 +38,25 @@ export const AuthProvider = ({ children }) => {
     };
 
     verifyAuth();
-  }, []);
+  }, [token]);
 
-  const login = (token) => {
-    localStorage.setItem("authToken", token);
-    const decodedToken = jwtDecode(token);
+  const login = (newToken) => {
+    localStorage.setItem("authToken", newToken);
+    setToken(newToken); // ✅ keep it in state
+    const decodedToken = jwtDecode(newToken);
     setUser({ email: decodedToken.email });
     setIsAuthenticated(true);
   };
 
   const logout = () => {
     localStorage.removeItem("authToken");
+    setToken(null);
     setIsAuthenticated(false);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

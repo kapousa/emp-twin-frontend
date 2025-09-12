@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Bot, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useAuth } from "@/contexts/AuthProvider";
 
 const QuestionForm = ({ messages, inputMessage, setInputMessage, isSubmitting, handleSubmit, messagesEndRef }) => {
   return (
