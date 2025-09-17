@@ -48,7 +48,7 @@ const LoginForm = () => {
           title: "Login successful",
           description: "Welcome back, admin!",
         });
-        navigate('/admin/dashboard');
+        navigate('/ask');
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
