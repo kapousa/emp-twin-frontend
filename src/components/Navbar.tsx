@@ -75,7 +75,7 @@ const Navbar = () => {
                 isActive("/admin/dashboard") ? "text-primary" : "text-muted-foreground"
               )}
             >
-              Resorces
+              Resources
             </Link>
 
             <Link
