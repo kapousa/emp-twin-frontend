@@ -12,7 +12,7 @@ import { useDropzone } from "react-dropzone";
 import { useToast } from "@/hooks/use-toast";
 import { AGENT_ASK_ENDPOINT } from "@/configurations/api";
 import { useAuth } from "@/contexts/AuthProvider";
-
+import { Checkbox } from "@/components/ui/checkbox";
 
 const AGENT_ASK_ENDPOINT_CONST = AGENT_ASK_ENDPOINT;
 
@@ -87,11 +87,11 @@ const AskPanel = () => {
   const [files, setFiles] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generateVideo, setGenerateVideo] = useState(false);
   const { toast } = useToast();
   const messagesEndRef = useRef(null);
 
   const { token } = useAuth();
-
 
   const tips = [
     { text: "Be specific about your business context and goals" },
@@ -130,7 +130,7 @@ const AskPanel = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, generateVideoOption) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
 
@@ -148,6 +148,7 @@ const AskPanel = () => {
       formData.append('chat_history', JSON.stringify([...messages, newUserMessage]));
       formData.append('documents', JSON.stringify(selectedDocuments));
       files.forEach(file => formData.append('user_docs', file));
+      formData.append('generate_video', generateVideoOption ? 'True' : 'False'); // This is the updated line
       formData.append('save', 'true');
 
       const response = await axios.post(AGENT_ASK_ENDPOINT_CONST, formData, {
@@ -174,6 +175,10 @@ const AskPanel = () => {
     }
   };
 
+  const handleFormSubmit = (e) => {
+    handleSubmit(e, generateVideo);
+  };
+
   return (
     <div className="w-full min-h-[calc(100vh-4rem)] bg-background">
       <div className="max-w-[90vw] mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -188,7 +193,8 @@ const AskPanel = () => {
           {/* Main Chat Panel */}
           <div className="flex-1 flex flex-col p-4 bg-background">
             <ChatDisplay messages={messages} messagesEndRef={messagesEndRef} />
-            <form onSubmit={handleSubmit} className="flex items-end gap-2 pt-4">
+            
+            <form onSubmit={handleFormSubmit} className="flex flex-col gap-3 pt-4">
               <Textarea
                 placeholder="Type your question..."
                 value={inputMessage}
@@ -196,20 +202,32 @@ const AskPanel = () => {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    handleSubmit(e);
+                    handleFormSubmit(e);
                   }
                 }}
                 className="flex-1 min-h-[40px] max-h-[150px] bg-background border-input resize-none"
                 rows={1}
                 disabled={isSubmitting}
               />
-              <Button 
-                type="submit" 
-                disabled={isSubmitting || !inputMessage.trim()}
-                className="h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground self-end"
-              >
-                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send'}
-              </Button>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="generate-video"
+                    checked={generateVideo}
+                    onCheckedChange={setGenerateVideo}
+                    disabled={isSubmitting}
+                  />
+                  <Label htmlFor="generate-video">Generate video</Label>
+                </div>
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting || !inputMessage.trim()}
+                  className="h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send'}
+                </Button>
+              </div>
             </form>
           </div>
 
