@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, Loader2, Bot, User, FileText, Plus, MessageSquare } from "lucide-react";
+import { Upload, Loader2, Bot, User, FileText, Plus, MessageSquare, Copy, Download } from "lucide-react";
 import TipsSection from "@/components/shared/TipsSection";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
@@ -17,7 +17,26 @@ import { Checkbox } from "@/components/ui/checkbox";
 const AGENT_ASK_ENDPOINT_CONST = AGENT_ASK_ENDPOINT;
 
 // Separate component for rendering the chat messages
-const ChatDisplay = ({ messages, messagesEndRef }) => {
+const ChatDisplay = ({ messages, messagesEndRef, toast }) => {
+  const handleCopy = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ title: "Copied!", description: "Answer has been copied to your clipboard." });
+    } catch (err) {
+      toast({ title: "Copy Failed", description: "Failed to copy text.", variant: "destructive" });
+    }
+  };
+
+  const handleDownload = (url) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'video-answer.mp4';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast({ title: "Downloading...", description: "Video download should begin shortly." });
+  };
+  
   return (
     <div className="flex-1 p-4 overflow-y-auto space-y-4">
       {messages.length === 0 ? (
@@ -32,8 +51,12 @@ const ChatDisplay = ({ messages, messagesEndRef }) => {
         messages.map((msg, index) => (
           <div key={index} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.sender === 'bot' && <Bot className="h-8 w-8 text-primary mt-1" />}
-            <div className={`p-3 rounded-xl max-w-2/3 ${msg.sender === 'user' ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted rounded-bl-none'}`}>
-              {msg.content === "thinking" ? (
+            <div className={`p-3 rounded-xl max-w-2/3 flex flex-col ${msg.sender === 'user' ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted rounded-bl-none'}`}>
+              
+              {/* === MESSAGE CONTENT === */}
+              {msg.type === 'video' ? (
+                <video src={msg.content} controls className="rounded-lg w-full max-h-96" />
+              ) : msg.content === "thinking" ? (
                 <div className="flex items-center space-x-1">
                   <span className="dot animate-pulse-dot-1"></span>
                   <span className="dot animate-pulse-dot-2"></span>
@@ -42,7 +65,33 @@ const ChatDisplay = ({ messages, messagesEndRef }) => {
               ) : (
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
               )}
+
+              {/* === ICONS FOR COPY/DOWNLOAD === */}
+              {msg.sender === 'bot' && msg.content !== 'thinking' && (
+                <div className="flex justify-end mt-2">
+                  {msg.type === 'video' ? (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleDownload(msg.content)}
+                      className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleCopy(msg.content)}
+                      className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
+
             {msg.sender === 'user' && <User className="h-8 w-8 text-muted-foreground mt-1" />}
           </div>
         ))
@@ -148,21 +197,38 @@ const AskPanel = () => {
       formData.append('chat_history', JSON.stringify([...messages, newUserMessage]));
       formData.append('documents', JSON.stringify(selectedDocuments));
       files.forEach(file => formData.append('user_docs', file));
-      formData.append('generate_video', generateVideoOption ? 'True' : 'False'); // This is the updated line
+      formData.append('generate_video', generateVideoOption ? 'true' : 'false');
       formData.append('save', 'true');
 
       const response = await axios.post(AGENT_ASK_ENDPOINT_CONST, formData, {
-        headers: { 'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-         },
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
       });
+      
+      const { answer, video_url } = response.data;
+      
+      if (video_url) {
+        toast({
+          title: "Generating video...",
+          description: "The video is being generated and will appear here once it is ready.",
+        });
 
-      const result = response.data;
-      const botAnswer = result.answer || "Sorry, I couldn't generate a response.";
-      
-      setMessages(prev => prev.slice(0, -1).concat([{ sender: "bot", content: botAnswer }]));
-      
-      toast({ title: "Question sent!", description: "Answer received." });
+        setTimeout(() => {
+          const videoMessage = { sender: "bot", content: video_url, type: 'video' };
+          setMessages(prev => prev.slice(0, -1).concat([videoMessage]));
+          toast({ title: "Video ready!", description: "Video has been loaded from the backend." });
+          setIsSubmitting(false);
+        }, 10000); 
+
+      } else {
+        const botAnswer = answer || "Sorry, I couldn't generate a response.";
+        setMessages(prev => prev.slice(0, -1).concat([{ sender: "bot", content: botAnswer }]));
+        toast({ title: "Question sent!", description: "Answer received." });
+        setIsSubmitting(false);
+      }
+
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
@@ -170,7 +236,6 @@ const AskPanel = () => {
       
       setMessages(prev => prev.slice(0, -1).concat([{ sender: "bot", content: `Error: ${errorMessage}` }]));
       toast({ title: "Submission failed", description: errorMessage, variant: "destructive" });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -192,7 +257,7 @@ const AskPanel = () => {
 
           {/* Main Chat Panel */}
           <div className="flex-1 flex flex-col p-4 bg-background">
-            <ChatDisplay messages={messages} messagesEndRef={messagesEndRef} />
+            <ChatDisplay messages={messages} messagesEndRef={messagesEndRef} toast={toast} />
             
             <form onSubmit={handleFormSubmit} className="flex flex-col gap-3 pt-4">
               <Textarea
