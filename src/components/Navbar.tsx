@@ -60,6 +60,15 @@ const Navbar = () => {
         <nav className="bg-muted border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-center space-x-8">
             <Link
+              to="/clients"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                isActive("/clients") ? "text-primary" : "text-muted-foreground"
+              )}
+            >
+              Clients
+            </Link>
+            <Link
               to="/ask"
               className={cn(
                 "text-sm font-medium transition-colors hover:text-primary",
