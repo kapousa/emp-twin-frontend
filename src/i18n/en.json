@@ -4,6 +4,10 @@
     "title": "Welcome to Croco",
     "description": "An AI-powered platform that helps you get intelligent answers to your business questions. Upload documents and receive expert responses backed by comprehensive research."
   },
+  "featuresheader": {
+    "title": "Features List",
+    "description": "Everything you need for intelligent business insights"
+  },
   "features": {
     "documentUpload": {
       "title": "Document Upload",
@@ -33,12 +37,105 @@
     }
   },
   "navbar": {
-    "logo_title": "Croco App", 
+    "logo_title": "Croco App",
     "login_link": "Login",
     "logout_button": "Logout",
     "clients_link": "Clients",
     "ask_faleh_link": "Ask Croco",
     "resources_link": "Resources",
     "control_panel_link": "Control Panel"
+  },
+  "login": {
+    "title": "Login",
+    "description": "Sign in to access the workspace",
+    "demo_credentials": "Demo credentials: admin@croconile.ai / demo123",
+    "email_label": "Email",
+    "email_placeholder": "admin@croconile.ai",
+    "password_label": "Password",
+    "sign_in": "Sign In",
+    "signing_in": "Signing in..."
+  },
+  "toast": {
+    "missing_credentials": {
+      "title": "Missing credentials",
+      "description": "Please enter both email and password."
+    },
+    "login_success": {
+      "title": "Login successful",
+      "description": "Welcome back, admin!"
+    },
+    "login_failed": {
+      "title": "Login failed",
+      "description": "Please check your credentials and try again."
+    },
+    "unexpected_error": "An unexpected error occurred. Please try again later.",
+    "copy_success": {
+      "title": "Copied!",
+      "description": "Answer has been copied to your clipboard."
+    },
+    "copy_failed": {
+      "title": "Copy Failed",
+      "description": "Failed to copy text."
+    },
+    "download_start": {
+      "title": "Downloading...",
+      "description": "Video download should begin shortly."
+    },
+    "video_generating": {
+      "title": "Generating video...",
+      "description": "The video is being generated and will appear here once it is ready."
+    },
+    "video_ready": {
+      "title": "Video ready!",
+      "description": "Video has been loaded from the backend."
+    },
+    "question_sent": {
+      "title": "Question sent!",
+      "description": "Answer received."
+    },
+    "submission_failed": {
+      "title": "Submission failed"
+    },
+    "unexpected_error_short": "Please try again later."
+  },
+  "askpanel": {
+    "chat_start": {
+      "title": "Start a conversation",
+      "description": "Submit your business questions along with supporting documents to get AI-powered insights."
+    },
+    "conversations": {
+      "header": "Conversations",
+      "example_chat": "Example Chat",
+      "project_analysis": "Project Analysis"
+    },
+    "input_placeholder": "Type your question...",
+    "generate_video_label": "Generate video",
+    "send_button": "Send",
+    "bot_fallback_error": "Sorry, I couldn't generate a response.",
+    "error_prefix": "Error",
+    "options_header": "Query Options",
+    "tips": {
+      "header": "Tips for Best Results:",
+      "tip1": "Be specific about your business context and goals",
+      "tip2": "Include relevant financial data or market information",
+      "tip3": "Mention your location and target market",
+      "tip4": "Upload business plans, financial statements, or market research"
+    },
+    "docs_upload": {
+      "label": "Supporting Documents (Optional)",
+      "text": "Click or drag files to upload",
+      "selected_files_label": "Selected files:"
+    },
+    "quick_actions": {
+      "label": "Quick Action Generator (Optional)"
+    },
+    "docs": {
+      "business_plan": "Business Plan",
+      "franchise_manual": "Franchise Manual",
+      "staff_manual": "Staff Manual",
+      "qa_guideline": "Quality Assurance Guideline",
+      "branding_guideline": "Branding Guideline",
+      "other_docs": "All other possible documents"
+    }
   }
 }

@@ -4,6 +4,10 @@
     "title": "欢迎来到 Croco",
     "description": "一个由人工智能驱动的平台，帮助您获得商业问题的智能解答。上传文档并接收由全面研究支持的专家回复。"
   },
+  "featuresheader": {
+    "title": "功能列表",
+    "description": "获取智能业务洞察所需的一切"
+  },
   "features": {
     "documentUpload": {
       "title": "文档上传",
@@ -40,5 +44,98 @@
     "ask_faleh_link": "提问 Croco", 
     "resources_link": "资源",
     "control_panel_link": "控制面板"
+  },
+  "login": {
+    "title": "登录",
+    "description": "登录以访问工作区",
+    "demo_credentials": "演示凭证: admin@croconile.ai / demo123",
+    "email_label": "电子邮件",
+    "email_placeholder": "admin@croconile.ai",
+    "password_label": "密码",
+    "sign_in": "登录",
+    "signing_in": "正在登录..."
+  },
+  "toast": {
+    "missing_credentials": {
+      "title": "缺少凭证",
+      "description": "请输入电子邮件和密码。"
+    },
+    "login_success": {
+      "title": "登录成功",
+      "description": "欢迎回来，管理员！"
+    },
+    "login_failed": {
+      "title": "登录失败",
+      "description": "请检查您的凭证并重试。"
+    },
+    "unexpected_error": "发生意外错误。请稍后重试。",
+    "copy_success": {
+      "title": "已复制!",
+      "description": "答案已复制到您的剪贴板。"
+    },
+    "copy_failed": {
+      "title": "复制失败",
+      "description": "复制文本失败。"
+    },
+    "download_start": {
+      "title": "正在下载...",
+      "description": "视频下载应该很快开始。"
+    },
+    "video_generating": {
+      "title": "正在生成视频...",
+      "description": "视频正在生成中，完成后会显示在这里。"
+    },
+    "video_ready": {
+      "title": "视频就绪!",
+      "description": "视频已从后端加载。"
+    },
+    "question_sent": {
+      "title": "问题已发送!",
+      "description": "已收到答案。"
+    },
+    "submission_failed": {
+      "title": "提交失败"
+    },
+    "unexpected_error_short": "请稍后重试。"
+  },
+  "askpanel": {
+    "chat_start": {
+      "title": "开始对话",
+      "description": "提交您的业务问题和支持文档，以获取人工智能洞察。"
+    },
+    "conversations": {
+      "header": "对话记录",
+      "example_chat": "示例聊天",
+      "project_analysis": "项目分析"
+    },
+    "input_placeholder": "输入您的问题...",
+    "generate_video_label": "生成视频",
+    "send_button": "发送",
+    "bot_fallback_error": "抱歉，无法生成回复。",
+    "error_prefix": "错误",
+    "options_header": "查询选项",
+    "tips": {
+      "header": "获取最佳结果的提示:",
+      "tip1": "具体说明您的业务背景和目标",
+      "tip2": "包括相关的财务数据或市场信息",
+      "tip3": "提及您的位置和目标市场",
+      "tip4": "上传商业计划书、财务报表或市场研究报告"
+    },
+    "docs_upload": {
+      "label": "支持文档 (可选)",
+      "text": "点击或拖放文件上传",
+      "selected_files_label": "已选文件:"
+    },
+    "quick_actions": {
+      "label": "快速行动生成器 (可选)"
+    },
+    "docs": {
+      "business_plan": "商业计划书",
+      "franchise_manual": "特许经营手册",
+      "staff_manual": "员工手册",
+      "qa_guideline": "质量保证指南",
+      "branding_guideline": "品牌指南",
+      "other_docs": "所有其他可能的文档"
+    }
   }
 }

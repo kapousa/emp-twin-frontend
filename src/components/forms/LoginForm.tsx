@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import axios from "axios";
 import { USER_LOGIN_ENDPOINT } from "@/configurations/api";
 import { useAuth } from "@/contexts/AuthProvider";
+import { useTranslation } from "react-i18next"; // <-- NEW IMPORT
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -16,13 +17,14 @@ const LoginForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useTranslation(); // <-- USE HOOK
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       toast({
-        title: "Missing credentials",
-        description: "Please enter both email and password.",
+        title: t("toast.missing_credentials.title"), // Translated
+        description: t("toast.missing_credentials.description"), // Translated
         variant: "destructive",
       });
       return;
@@ -45,22 +47,22 @@ const LoginForm = () => {
         const { access_token } = response.data;
         login(access_token);
         toast({
-          title: "Login successful",
-          description: "Welcome back, admin!",
+          title: t("toast.login_success.title"), // Translated
+          description: t("toast.login_success.description"), // Translated
         });
         navigate('/ask');
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         toast({
-          title: "Login failed",
-          description: error.response.data.detail || "Please check your credentials and try again.",
+          title: t("toast.login_failed.title"), // Translated
+          description: error.response.data.detail || t("toast.login_failed.description"), // Fallback translated
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Login failed",
-          description: "An unexpected error occurred. Please try again later.",
+          title: t("toast.login_failed.title"), // Translated
+          description: t("toast.unexpected_error"), // Translated
           variant: "destructive",
         });
       }
@@ -72,11 +74,11 @@ const LoginForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t("login.email_label")}</Label>
         <Input
           id="email"
           type="email"
-          placeholder="admin@franchisegpt.com"
+          placeholder={t("login.email_placeholder")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="bg-background border-input"
@@ -84,7 +86,7 @@ const LoginForm = () => {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t("login.password_label")}</Label>
         <Input
           id="password"
           type="password"
@@ -103,14 +105,14 @@ const LoginForm = () => {
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Signing in...
+            {t("login.signing_in")} {/* Translated */}
           </>
         ) : (
-          'Sign In'
+          t("login.sign_in") /* Translated */
         )}
       </Button>
     </form>
   );
 };
 
-export default LoginForm;
+export default LoginForm; 

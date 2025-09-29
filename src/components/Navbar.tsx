@@ -29,18 +29,19 @@ const Navbar = () => {
             </div>
 
             {/* Auth section and Language Switcher */}
-            <div className="flex items-center"> 
+            {/* FIX: Use gap-4 for consistent LTR/RTL spacing between Language Switcher and Auth/User links */}
+            <div className="flex items-center gap-4"> 
               
               <LanguageSwitcher />
 
               {isAuthenticated ? (
                 <>
-                  <span className="text-sm font-medium text-muted-foreground hidden sm:block ms-8"> {/* FIX: Changed ml-8 to ms-8 */}
+                  <span className="text-sm font-medium text-muted-foreground hidden sm:block">
                     {user?.email}
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground ms-6" // FIX: Changed ml-6 to ms-6
+                    className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
                   >
                     {t("navbar.logout_button")}
                   </button>
@@ -48,9 +49,8 @@ const Navbar = () => {
               ) : (
                 <Link
                   to="/admin/login"
-                  // FIX: Changed ml-8 to ms-8
                   className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary ms-8",
+                    "text-sm font-medium transition-colors hover:text-primary",
                     isActive("/admin/login") ? "text-primary" : "text-muted-foreground"
                   )}
                 >
@@ -65,7 +65,7 @@ const Navbar = () => {
       {/* Conditionally rendered Bottom Navbar */}
       {isAuthenticated && (
         <nav className="bg-muted border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-center space-x-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-center gap-8">
             <Link
               to="/clients"
               className={cn(

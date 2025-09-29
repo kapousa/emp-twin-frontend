@@ -4,6 +4,10 @@
     "title": "مرحباً بك في كروكو",
     "description": "منصة مدعومة بالذكاء الاصطناعي تساعدك في الحصول على إجابات ذكية لأسئلتك التجارية. قم بتحميل المستندات وتلقَّ ردود الخبراء المدعومة ببحث شامل."
   },
+  "featuresheader": {
+    "title": "قائمة الميزات",
+    "description": "كل ما تحتاجه للحصول على رؤى عمل ذكية"
+  },
   "features": {
     "documentUpload": {
       "title": "تحميل المستندات",
@@ -40,5 +44,98 @@
     "ask_faleh_link": "اسأل كروكو", 
     "resources_link": "الموارد",
     "control_panel_link": "لوحة التحكم"
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "description": "سجّل الدخول للوصول إلى مساحة العمل",
+    "demo_credentials": "بيانات تجريبية: admin@croconile.ai / demo123",
+    "email_label": "البريد الإلكتروني",
+    "email_placeholder": "admin@croconile.ai",
+    "password_label": "كلمة المرور",
+    "sign_in": "تسجيل الدخول",
+    "signing_in": "جاري تسجيل الدخول..."
+  },
+  "toast": {
+    "missing_credentials": {
+      "title": "بيانات تسجيل مفقودة",
+      "description": "الرجاء إدخال كل من البريد الإلكتروني وكلمة المرور."
+    },
+    "login_success": {
+      "title": "تم تسجيل الدخول بنجاح",
+      "description": "مرحباً بعودتك أيها المشرف!"
+    },
+    "login_failed": {
+      "title": "فشل تسجيل الدخول",
+      "description": "الرجاء التحقق من بيانات الاعتماد والمحاولة مرة أخرى."
+    },
+    "unexpected_error": "حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى لاحقاً.",
+    "copy_success": {
+      "title": "تم النسخ!",
+      "description": "تم نسخ الإجابة إلى الحافظة الخاصة بك."
+    },
+    "copy_failed": {
+      "title": "فشل النسخ",
+      "description": "فشل في نسخ النص."
+    },
+    "download_start": {
+      "title": "جاري التحميل...",
+      "description": "يجب أن يبدأ تنزيل الفيديو قريباً."
+    },
+    "video_generating": {
+      "title": "جاري إنشاء الفيديو...",
+      "description": "يتم إنشاء الفيديو وسيظهر هنا بمجرد أن يصبح جاهزاً."
+    },
+    "video_ready": {
+      "title": "الفيديو جاهز!",
+      "description": "تم تحميل الفيديو من الواجهة الخلفية (Backend)."
+    },
+    "question_sent": {
+      "title": "تم إرسال السؤال!",
+      "description": "تم استلام الإجابة."
+    },
+    "submission_failed": {
+      "title": "فشل الإرسال"
+    },
+    "unexpected_error_short": "الرجاء المحاولة مرة أخرى لاحقاً."
+  },
+  "askpanel": {
+    "chat_start": {
+      "title": "ابدأ محادثة",
+      "description": "قدّم أسئلتك التجارية مع المستندات الداعمة للحصول على رؤى مدعومة بالذكاء الاصطناعي."
+    },
+    "conversations": {
+      "header": "المحادثات",
+      "example_chat": "محادثة مثال",
+      "project_analysis": "تحليل المشروع"
+    },
+    "input_placeholder": "اكتب سؤالك...",
+    "generate_video_label": "إنشاء فيديو",
+    "send_button": "إرسال",
+    "bot_fallback_error": "عذراً، لم أتمكن من إنشاء رد.",
+    "error_prefix": "خطأ",
+    "options_header": "خيارات الاستعلام",
+    "tips": {
+      "header": "نصائح للحصول على أفضل النتائج:",
+      "tip1": "كن محدداً بشأن سياق وأهداف عملك",
+      "tip2": "قم بتضمين البيانات المالية أو معلومات السوق ذات الصلة",
+      "tip3": "اذكر موقعك والسوق المستهدف",
+      "tip4": "قم بتحميل خطط الأعمال، البيانات المالية، أو أبحاث السوق"
+    },
+    "docs_upload": {
+      "label": "المستندات الداعمة (اختياري)",
+      "text": "انقر أو اسحب الملفات للتحميل",
+      "selected_files_label": "الملفات المحددة:"
+    },
+    "quick_actions": {
+      "label": "مُولّد الإجراءات السريعة (اختياري)"
+    },
+    "docs": {
+      "business_plan": "خطة العمل",
+      "franchise_manual": "دليل الامتياز",
+      "staff_manual": "دليل الموظفين",
+      "qa_guideline": "دليل ضمان الجودة",
+      "branding_guideline": "دليل العلامة التجارية",
+      "other_docs": "جميع المستندات الأخرى المحتملة"
+    }
   }
 }

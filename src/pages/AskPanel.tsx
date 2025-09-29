@@ -13,28 +13,42 @@ import { useToast } from "@/hooks/use-toast";
 import { AGENT_ASK_ENDPOINT } from "@/configurations/api";
 import { useAuth } from "@/contexts/AuthProvider";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslation } from "react-i18next"; // <-- NEW IMPORT
 
 const AGENT_ASK_ENDPOINT_CONST = AGENT_ASK_ENDPOINT;
 
 // Separate component for rendering the chat messages
 const ChatDisplay = ({ messages, messagesEndRef, toast }) => {
+  const { t } = useTranslation(); // <-- USE HOOK
+
   const handleCopy = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast({ title: "Copied!", description: "Answer has been copied to your clipboard." });
+      toast({ 
+        title: t("toast.copy_success.title"), 
+        description: t("toast.copy_success.description") 
+      });
     } catch (err) {
-      toast({ title: "Copy Failed", description: "Failed to copy text.", variant: "destructive" });
+      toast({ 
+        title: t("toast.copy_failed.title"), 
+        description: t("toast.copy_failed.description"), 
+        variant: "destructive" 
+      });
     }
   };
 
   const handleDownload = (url) => {
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'video-answer.mp4';
+    // Download filename remains hardcoded, but description is translated
+    link.download = 'video-answer.mp4'; 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast({ title: "Downloading...", description: "Video download should begin shortly." });
+    toast({ 
+      title: t("toast.download_start.title"), 
+      description: t("toast.download_start.description") 
+    });
   };
   
   return (
@@ -42,9 +56,9 @@ const ChatDisplay = ({ messages, messagesEndRef, toast }) => {
       {messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
           <MessageSquare className="h-16 w-16 mb-4" />
-          <h2 className="text-xl font-semibold">Start a conversation</h2>
+          <h2 className="text-xl font-semibold">{t("askpanel.chat_start.title")}</h2>
           <p className="max-w-md mt-2">
-            Submit your business questions along with supporting documents to get AI-powered insights.
+            {t("askpanel.chat_start.description")}
           </p>
         </div>
       ) : (
@@ -102,33 +116,39 @@ const ChatDisplay = ({ messages, messagesEndRef, toast }) => {
 };
 
 // Component for the conversation list sidebar
-const ConversationList = ({ onNewConversation }) => (
-  <div className="flex flex-col p-4 border-r border-gray-200">
-    <div className="flex justify-between items-center mb-4">
-      <h3 className="text-lg font-semibold">Conversations</h3>
-      <Button variant="outline" size="icon" onClick={onNewConversation}>
-        <Plus className="h-4 w-4" />
-      </Button>
+const ConversationList = ({ onNewConversation }) => {
+  const { t } = useTranslation(); // <-- USE HOOK
+  
+  return (
+    <div className="flex flex-col p-4 border-r border-gray-200">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">{t("askpanel.conversations.header")}</h3>
+        <Button variant="outline" size="icon" onClick={onNewConversation}>
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+      <ul className="space-y-2">
+        <li className="p-2 rounded-md hover:bg-gray-100 cursor-pointer">
+          {t("askpanel.conversations.example_chat")}
+        </li>
+        <li className="p-2 rounded-md hover:bg-gray-100 cursor-pointer">
+          {t("askpanel.conversations.project_analysis")}
+        </li>
+      </ul>
     </div>
-    <ul className="space-y-2">
-      <li className="p-2 rounded-md hover:bg-gray-100 cursor-pointer">
-        Example Chat
-      </li>
-      <li className="p-2 rounded-md hover:bg-gray-100 cursor-pointer">
-        Project Analysis
-      </li>
-    </ul>
-  </div>
-);
+  );
+};
 
-const documentOptions = [
-  { value: "Business Plan", label: "Business Plan" },
-  { value: "Franchise Manual", label: "Franchise Manual" },
-  { value: "Staff Manual", label: "Staff Manual" },
-  { value: "Quality Assurance Guideline", label: "Quality Assurance Guideline" },
-  { value: "Branding Guideline", label: "Branding Guideline" },
-  { value: "All other possible documents", label: "All other possible documents" },
+// Data structures for quick actions (Labels MUST be translated)
+const DOCUMENT_OPTIONS_KEYS = [
+  { value: "Business Plan", labelKey: "askpanel.docs.business_plan" },
+  { value: "Franchise Manual", labelKey: "askpanel.docs.franchise_manual" },
+  { value: "Staff Manual", labelKey: "askpanel.docs.staff_manual" },
+  { value: "Quality Assurance Guideline", labelKey: "askpanel.docs.qa_guideline" },
+  { value: "Branding Guideline", labelKey: "askpanel.docs.branding_guideline" },
+  { value: "All other possible documents", labelKey: "askpanel.docs.other_docs" },
 ];
+
 
 const AskPanel = () => {
   const [messages, setMessages] = useState([]);
@@ -137,16 +157,18 @@ const AskPanel = () => {
   const [selectedDocuments, setSelectedDocuments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generateVideo, setGenerateVideo] = useState(false);
+  
   const { toast } = useToast();
   const messagesEndRef = useRef(null);
-
+  const { t } = useTranslation(); // <-- USE HOOK
   const { token } = useAuth();
 
+  // Tips section now uses translated text
   const tips = [
-    { text: "Be specific about your business context and goals" },
-    { text: "Include relevant financial data or market information" },
-    { text: "Mention your location and target market" },
-    { text: "Upload business plans, financial statements, or market research" }
+    { text: t("askpanel.tips.tip1") },
+    { text: t("askpanel.tips.tip2") },
+    { text: t("askpanel.tips.tip3") },
+    { text: t("askpanel.tips.tip4") }
   ];
 
   const handleNewConversation = () => {
@@ -211,44 +233,56 @@ const AskPanel = () => {
       
       if (video_url) {
         toast({
-          title: "Generating video...",
-          description: "The video is being generated and will appear here once it is ready.",
+          title: t("toast.video_generating.title"), // Translated
+          description: t("toast.video_generating.description"), // Translated
         });
 
         setTimeout(() => {
           const videoMessage = { sender: "bot", content: video_url, type: 'video' };
           setMessages(prev => prev.slice(0, -1).concat([videoMessage]));
-          toast({ title: "Video ready!", description: "Video has been loaded from the backend." });
+          toast({ 
+            title: t("toast.video_ready.title"), // Translated
+            description: t("toast.video_ready.description") // Translated
+          });
           setIsSubmitting(false);
         }, 10000); 
 
       } else {
-        const botAnswer = answer || "Sorry, I couldn't generate a response.";
+        const botAnswer = answer || t("askpanel.bot_fallback_error"); // Translated fallback
         setMessages(prev => prev.slice(0, -1).concat([{ sender: "bot", content: botAnswer }]));
-        toast({ title: "Question sent!", description: "Answer received." });
+        toast({ 
+          title: t("toast.question_sent.title"), // Translated
+          description: t("toast.question_sent.description") // Translated
+        });
         setIsSubmitting(false);
       }
 
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Please try again later.";
+        : t("toast.unexpected_error_short"); // Translated
       
-      setMessages(prev => prev.slice(0, -1).concat([{ sender: "bot", content: `Error: ${errorMessage}` }]));
-      toast({ title: "Submission failed", description: errorMessage, variant: "destructive" });
+      setMessages(prev => prev.slice(0, -1).concat([{ sender: "bot", content: `${t("askpanel.error_prefix")}: ${errorMessage}` }])); // Translated prefix
+      toast({ 
+        title: t("toast.submission_failed.title"), // Translated
+        description: errorMessage, 
+        variant: "destructive" 
+      });
       setIsSubmitting(false);
     }
   };
 
   const handleFormSubmit = (e) => {
-    handleSubmit(e, generateVideo);
+    // We pass the event object which is expected by handleSubmit
+    handleSubmit(e, generateVideo); 
   };
 
   return (
     <div className="w-full min-h-[calc(100vh-4rem)] bg-background">
       <div className="max-w-[90vw] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-4">Ask Faleh</h1>
+          {/* Using the translated Navbar key, which is Ask Croco */}
+          <h1 className="text-3xl font-bold text-foreground mb-4">{t("navbar.ask_faleh_link")}</h1> 
         </div>
 
         <div className="flex w-full border rounded-lg shadow-lg bg-card overflow-hidden h-[calc(100vh-16rem)]">
@@ -261,7 +295,7 @@ const AskPanel = () => {
             
             <form onSubmit={handleFormSubmit} className="flex flex-col gap-3 pt-4">
               <Textarea
-                placeholder="Type your question..."
+                placeholder={t("askpanel.input_placeholder")} // Translated
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={(e) => {
@@ -283,14 +317,14 @@ const AskPanel = () => {
                     onCheckedChange={setGenerateVideo}
                     disabled={isSubmitting}
                   />
-                  <Label htmlFor="generate-video">Generate video</Label>
+                  <Label htmlFor="generate-video">{t("askpanel.generate_video_label")}</Label> {/* Translated */}
                 </div>
                 <Button 
                   type="submit" 
                   disabled={isSubmitting || !inputMessage.trim()}
                   className="h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
-                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send'}
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("askpanel.send_button")} {/* Translated */}
                 </Button>
               </div>
             </form>
@@ -298,26 +332,26 @@ const AskPanel = () => {
 
           {/* Tips and Options Panel (Right) */}
           <div className="w-80 border-l p-4 space-y-6 bg-secondary/20 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-foreground">Query Options</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t("askpanel.options_header")}</h3> {/* Translated */}
             
-            <TipsSection title="Tips for Best Results:" tips={tips} />
+            <TipsSection title={t("askpanel.tips.header")} tips={tips} /> {/* Translated header */}
 
             {/* Supporting Documents */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-foreground">
-                Supporting Documents (Optional)
+                {t("askpanel.docs_upload.label")} {/* Translated */}
               </Label>
               <div {...getRootProps()} className="flex items-center space-x-2 cursor-pointer border border-dashed rounded-md p-4 bg-background/50 text-center hover:bg-background/70">
                 <input {...getInputProps()} />
                 <div className="flex items-center space-x-2 text-xs text-muted-foreground mx-auto">
                   <Upload className="h-4 w-4" />
-                  <span>Click or drag files to upload</span>
+                  <span>{t("askpanel.docs_upload.text")}</span> {/* Translated */}
                 </div>
               </div>
               {files.length > 0 && (
                 <Alert className="border-primary/20 bg-primary/5 mt-2">
                   <AlertDescription className="text-sm">
-                    Selected files:
+                    {t("askpanel.docs_upload.selected_files_label")} {/* Translated */}
                     <ul className="list-disc list-inside mt-1">
                       {files.map((file, index) => (
                         <li key={index} className="flex items-center">
@@ -334,21 +368,21 @@ const AskPanel = () => {
             {/* Quick Action Generator */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-foreground">
-                Quick Action Generator (Optional)
+                {t("askpanel.quick_actions.label")} {/* Translated */}
               </Label>
               <div className="grid grid-cols-1 gap-4">
-                {documentOptions.map((option) => (
+                {DOCUMENT_OPTIONS_KEYS.map((option) => (
                   <div key={option.value} className="flex items-center space-x-2">
-                    <Input
-                      type="checkbox"
+                    {/* Using Checkbox component's internal logic for input type checkbox */}
+                    <Checkbox
                       id={option.value}
                       value={option.value}
                       checked={selectedDocuments.includes(option.value)}
-                      onChange={() => handleCheckboxChange(option.value)}
+                      onCheckedChange={() => handleCheckboxChange(option.value)}
                       className="w-4 h-4 text-primary bg-background border-input focus:ring-primary"
                     />
                     <Label htmlFor={option.value} className="text-sm cursor-pointer">
-                      {option.label}
+                      {t(option.labelKey)} {/* Translated label */}
                     </Label>
                   </div>
                 ))}

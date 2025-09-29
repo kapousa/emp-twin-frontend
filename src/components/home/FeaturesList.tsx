@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
+import { useTranslation } from "react-i18next";
+
 interface Feature {
   title: string;
   description: string;
@@ -11,6 +13,8 @@ interface FeaturesListProps {
 }
 
 const FeaturesList = ({ features }: FeaturesListProps) => {
+  const { t } = useTranslation();
+
   return (
     <Card className="bg-card border-border">
       <CardHeader>
@@ -19,9 +23,9 @@ const FeaturesList = ({ features }: FeaturesListProps) => {
             <FileText className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-xl">Platform Features</CardTitle>
+            <CardTitle className="text-xl">{t("featuresheader.title")}</CardTitle>
             <CardDescription>
-              Everything you need for intelligent business insights
+              {t("featuresheader.description")}
             </CardDescription>
           </div>
         </div>
