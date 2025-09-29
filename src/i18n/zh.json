@@ -1,0 +1,44 @@
+{
+  "homeTitle": "项目 X",
+  "hero": {
+    "title": "欢迎来到 Croco",
+    "description": "一个由人工智能驱动的平台，帮助您获得商业问题的智能解答。上传文档并接收由全面研究支持的专家回复。"
+  },
+  "features": {
+    "documentUpload": {
+      "title": "文档上传",
+      "description": "支持 PDF、Word 和 Excel 文件"
+    },
+    "aiAnalysis": {
+      "title": "人工智能分析",
+      "description": "基于您的文档的智能回复"
+    },
+    "expertSupport": {
+      "title": "专家支持",
+      "description": "来自业务专家的专业回复"
+    }
+  },
+  "featureCards": {
+    "askQuestions": {
+      "title": "提出问题",
+      "description": "提交您的商业问题及支持文档",
+      "content": "上传 PDF、Word 或 Excel 文件以及您的问题，以获取针对您的特定业务需求量身定制的全面人工智能洞察。",
+      "buttonText": "提问 Croco"
+    },
+    "adminResponses": {
+      "title": "管理员回复",
+      "description": "提供附带支持文档的专家回复",
+      "content": "提交对用户问题的详细回复，并附带支持文档、研究和专家分析，以帮助用户做出明智的商业决策。",
+      "buttonText": "前往管理员面板"
+    }
+  },
+  "navbar": {
+    "logo_title": "Croco 应用", 
+    "login_link": "登录",
+    "logout_button": "登出",
+    "clients_link": "客户",
+    "ask_faleh_link": "提问 Croco", 
+    "resources_link": "资源",
+    "control_panel_link": "控制面板"
+  }
+}

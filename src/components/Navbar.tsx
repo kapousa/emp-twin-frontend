@@ -1,8 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthProvider";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const Navbar = () => {
+  const { t } = useTranslation();
+  
   const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
 
@@ -14,40 +18,43 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Top Navbar: Always visible, contains Logo and Auth status */}
       <nav className="bg-background border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16 justify-between">
-            {/* Logo on the far left */}
+            {/* Logo */}
             <div className="flex-shrink-0">
               <Link to="/" className="text-xl font-bold text-primary">
-                FranchiseGPT
+                {t("navbar.logo_title")}
               </Link>
             </div>
 
-            {/* Auth section on the far right */}
-            <div className="flex items-center space-x-8">
+            {/* Auth section and Language Switcher */}
+            <div className="flex items-center"> 
+              
+              <LanguageSwitcher />
+
               {isAuthenticated ? (
                 <>
-                  <span className="text-sm font-medium text-muted-foreground">
+                  <span className="text-sm font-medium text-muted-foreground hidden sm:block ms-8"> {/* FIX: Changed ml-8 to ms-8 */}
                     {user?.email}
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
+                    className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground ms-6" // FIX: Changed ml-6 to ms-6
                   >
-                    Logout
+                    {t("navbar.logout_button")}
                   </button>
                 </>
               ) : (
                 <Link
                   to="/admin/login"
+                  // FIX: Changed ml-8 to ms-8
                   className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary",
+                    "text-sm font-medium transition-colors hover:text-primary ms-8",
                     isActive("/admin/login") ? "text-primary" : "text-muted-foreground"
                   )}
                 >
-                  Login
+                  {t("navbar.login_link")}
                 </Link>
               )}
             </div>
@@ -55,7 +62,7 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Conditionally rendered Bottom Navbar: Only for authenticated users */}
+      {/* Conditionally rendered Bottom Navbar */}
       {isAuthenticated && (
         <nav className="bg-muted border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-center space-x-8">
@@ -66,7 +73,7 @@ const Navbar = () => {
                 isActive("/clients") ? "text-primary" : "text-muted-foreground"
               )}
             >
-              Clients
+              {t("navbar.clients_link")}
             </Link>
             <Link
               to="/ask"
@@ -75,7 +82,7 @@ const Navbar = () => {
                 isActive("/ask") ? "text-primary" : "text-muted-foreground"
               )}
             >
-              Ask Faleh
+              {t("navbar.ask_faleh_link")}
             </Link>
             <Link
               to="/admin/dashboard"
@@ -84,9 +91,8 @@ const Navbar = () => {
                 isActive("/admin/dashboard") ? "text-primary" : "text-muted-foreground"
               )}
             >
-              Resources
+              {t("navbar.resources_link")}
             </Link>
-
             <Link
               to="/ask"
               className={cn(
@@ -94,7 +100,7 @@ const Navbar = () => {
                 isActive("/controlpanel") ? "text-primary" : "text-muted-foreground"
               )}
             >
-              Control Panel
+              {t("navbar.control_panel_link")}
             </Link>
           </div>
         </nav>
