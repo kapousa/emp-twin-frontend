@@ -94,7 +94,7 @@ const Navbar = () => {
               {t("navbar.resources_link")}
             </Link>
             <Link
-              to="/ask"
+              to="/controlpanel"
               className={cn(
                 "text-sm font-medium transition-colors hover:text-primary",
                 isActive("/controlpanel") ? "text-primary" : "text-muted-foreground"
