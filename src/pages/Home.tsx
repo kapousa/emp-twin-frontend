@@ -36,8 +36,7 @@ const Home = () => {
           title={t("hero.title")}
           description={t("hero.description")}
         />
-
-        {/* Feature Cards */}
+        {/* 
         <div className="grid md:grid-cols-1 gap-8 mb-12">
           <FeatureCard
             icon={MessageSquare}
@@ -47,10 +46,7 @@ const Home = () => {
             linkTo="/ask"
             buttonText={t("featureCards.askQuestions.buttonText")}
             variant="default"
-          />
-
-          {/* Uncomment if needed */}
-          {/*
+          />   
           <FeatureCard
             icon={Users}
             title={t("featureCards.adminResponses.title")}
@@ -60,9 +56,8 @@ const Home = () => {
             buttonText={t("featureCards.adminResponses.buttonText")}
             variant="outline"
           />
-          */}
         </div>
-
+        */}
         <FeaturesList features={features} />
       </div>
     </div>
@@ -70,4 +65,3 @@ const Home = () => {
 };
 
 export default Home;
-  

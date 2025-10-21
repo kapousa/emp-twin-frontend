@@ -18,7 +18,7 @@ const LanguageSwitcher = () => {
   const languages = [
     { code: 'en', name: 'English' },
     { code: 'ar', name: 'العربية' }, // Assumes you have an 'arabic_name' key if you want it translated
-    { code: 'zh', name: '简体中文' }, // Assumes you have a 'chinese_name' key if you want it translated
+    //{ code: 'zh', name: '简体中文' }, // Assumes you have a 'chinese_name' key if you want it translated
   ];
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];

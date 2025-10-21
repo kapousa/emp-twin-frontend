@@ -1,8 +1,9 @@
-{
-  "homeTitle": "Project X",
+
+  {
+  "homeTitle": "Croconus",
   "hero": {
-    "title": "Welcome to Croco",
-    "description": "An AI-powered platform that helps you get intelligent answers to your business questions. Upload documents and receive expert responses backed by comprehensive research."
+    "title": "Scale your unique expertise with Croconus",
+    "description": "Create a Digital Copy that learns your knowledge, style, and memory, making your insights instantly available 24/7. Delegate tasks to an AI that truly thinks like you, freeing you to achieve more while ensuring your professional wisdom is always at hand, never forgotten."
   },
   "featuresheader": {
     "title": "Features List",
@@ -27,7 +28,7 @@
       "title": "Ask Questions",
       "description": "Submit your business questions with supporting documents",
       "content": "Upload PDFs, Word documents, or Excel files along with your questions to get comprehensive AI-powered insights tailored to your specific business needs.",
-      "buttonText": "Ask Croco"
+      "buttonText": "Ask Croconus"
     },
     "adminResponses": {
       "title": "Admin Responses",
@@ -37,13 +38,15 @@
     }
   },
   "navbar": {
-    "logo_title": "Croco App",
+    "home": "Home",
+    "logo_title": "Croconus",
     "login_link": "Login",
     "logout_button": "Logout",
     "clients_link": "Clients",
-    "ask_faleh_link": "Ask Croco",
+    "ask_faleh_link": "Ask Croconus",
     "resources_link": "Resources",
-    "control_panel_link": "Control Panel"
+    "control_panel_link": "Control Panel",
+    "digital_copy_link": "Digital Copy"
   },
   "login": {
     "title": "Login",
@@ -136,6 +139,116 @@
       "qa_guideline": "Quality Assurance Guideline",
       "branding_guideline": "Branding Guideline",
       "other_docs": "All other possible documents"
+    },
+    "digital_copy": {
+      "title": "Create Your Digital Copy",
+      "description": "Follow the steps to define the identity, knowledge, and style for your AI persona.",
+      "note": "The process uses Ollama and Mistral to create a dedicated RAG-powered agent."
+    }
+  },
+  "admin": {
+    "personas": {
+      "title": "Digital Copies List",
+      "header": "Your Digital Copies",
+      "description": "Manage and interact with all your created AI personas.",
+      "new_button": "Create New Copy",
+      "empty_state_message": "You haven't created any Digital Copies yet.",
+      "empty_state_button": "Start Building One",
+      "loading": "Loading Digital Copies...",
+      "error_auth_missing": "No authentication token available for this request. Please log in.",
+      "error_session_expired": "Session expired or invalid. Please log in again.",
+      "error_delete_auth_failed": "Session expired or invalid. Please log in again to delete.",
+      "error_fetch_failed": "Failed to fetch personas list.",
+      "error_delete_failed": "Failed to delete Digital Copy: {message}",
+      "error_unknown_fetch": "Could not load Digital Copy list. Please check the backend connection.",
+      "error_unknown_delete": "Failed to delete Digital Copy: Unknown error",
+      "error_try_reloading": "Try Reloading",
+      "error_go_to_login": "Go to Login",
+      "delete_confirm": "Are you sure you want to delete the Digital Copy with ID {id}? This action is permanent."
+    }
+  },
+  "persona_card": {
+    "role_prefix": "Role",
+    "details_button": "Details",
+    "chat_button": "Chat",
+    "knowledge_button": "Knowledge",
+    "delete_button": "Delete",
+    "status": {
+      "active": "Active",
+      "processing": "Processing",
+      "queued": "Queued",
+      "failed": "Failed",
+      "unknown": "Unknown"
+    },
+    "actions_disabled_prefix": "Actions disabled: Status is",
+    "actions_disabled_suffix": "",
+    "deleting": "Deleting"
+  },
+  "digital_copy": {
+    "title": "Create Your Digital Copy",
+    "description": "Follow the steps to define the identity, knowledge, and style for your AI persona.",
+    "note": "The process uses Ollama and Mistral to create a dedicated RAG-powered agent.",
+    "auth_error": "You are not authenticated. Please log in to create a digital copy.",
+    "build_fail_prefix": "Failed to initiate the build (Status:",
+    "build_fail_suffix": ").",
+    "unknown_build_error": "Failed to initiate the build: Unknown error."
+  },
+  "digital_copy_wizard": {
+    "step1": {
+      "title": "Step 1: Core Identity & Appearance",
+      "avatar_section_title": "Digital Avatar (Optional)",
+      "avatar_upload_description": "For the best results, please upload a **clear, high-resolution photo**.",
+      "remove_avatar_button": "Remove Avatar",
+      "persona_name_label": "Persona Name (Who is the clone of?)",
+      "persona_name_placeholder": "e.g., Jane Smith",
+      "persona_role_label": "Persona Role (Their expertise/job title)",
+      "persona_role_placeholder": "e.g., Marketing Expert, Franchise Consultant",
+      "persona_tone_label": "Preferred Conversational Tone",
+      "tone_professional": "Professional & Formal",
+      "tone_friendly": "Friendly & Casual",
+      "tone_expert": "Expert & Authoritative",
+      "tone_concise": "Direct & Concise"
+    },
+    "step2": {
+      "title": "Step 2: Knowledge Base",
+      "description": "Provide source material to teach the AI the persona's style, facts, and opinions.",
+      "text_input_title": "1. Paste Sample Text / Transcripts",
+      "text_input_placeholder": "e.g., 'I believe Python is superior for RAG pipelines because...'",
+      "file_upload_title": "2. Upload Documents (.txt, .pdf, .md)",
+      "files_selected": "Files selected: {count}",
+      "external_sources_title": "3. Connect External Data Sources (Future Feature)",
+      "email_integration": "Integrate with Gmail/Email Archive (Coming Soon)",
+      "twitter_integration": "Connect X (Twitter) Account (Coming Soon)",
+      "external_sources_note": "External integrations allow the AI to learn from your real-time communication."
+    },
+    "step3": {
+      "title": "Step 3: Confirmation",
+      "summary_header": "Digital Copy Summary:",
+      "avatar_selected": "Avatar Selected:",
+      "avatar_yes": "Yes ({name})",
+      "avatar_no": "No",
+      "persona_name": "Persona Name:",
+      "not_set": "Not set",
+      "role_expertise": "Role/Expertise:",
+      "conversational_tone": "Conversational Tone:",
+      "knowledge_files": "Knowledge Files:",
+      "files_uploaded": "{count} file(s) uploaded",
+      "none": "None",
+      "knowledge_text": "Knowledge Text:",
+      "text_input_summary": "Text Input ({count} chars)",
+      "warning_message": "**Warning:** Building the copy will start vector embedding and training, which may take a few minutes."
+    },
+    "navigation": {
+      "back_button": "Back",
+      "next_button": "Next",
+      "build_button": "Build Digital Copy",
+      "building_button": "Building...",
+      "step_indicator": "Step {current} of {total}"
+    },
+    "errors": {
+      "name_role_required": "Please provide the Persona Name and Role to continue.",
+      "build_initiation_error": "Error initiating the build: {message}",
+      "unknown_network_error": "An unknown network error occurred."
     }
   }
 }

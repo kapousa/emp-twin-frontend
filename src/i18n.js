@@ -10,8 +10,8 @@ i18n
   .init({
     resources: {
       en: { translation: en },
-      ar: { translation: ar },
-      zh: {translation: zh}
+      ar: { translation: ar }
+      //zh: {translation: zh}
     },
     lng: 'en', // default language
     fallbackLng: 'en',

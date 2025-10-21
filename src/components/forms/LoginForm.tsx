@@ -50,7 +50,7 @@ const LoginForm = () => {
           title: t("toast.login_success.title"), // Translated
           description: t("toast.login_success.description"), // Translated
         });
-        navigate('/ask');
+        navigate('/');
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

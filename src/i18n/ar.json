@@ -1,8 +1,8 @@
 {
   "homeTitle": "مشروع X",
   "hero": {
-    "title": "مرحباً بك في كروكو",
-    "description": "منصة مدعومة بالذكاء الاصطناعي تساعدك في الحصول على إجابات ذكية لأسئلتك التجارية. قم بتحميل المستندات وتلقَّ ردود الخبراء المدعومة ببحث شامل."
+    "title": " Croconus قم بتوسيع خبراتك الفريدة مع",
+    "description": "أنشئ نسخة رقمية تتعلم معرفتك، أسلوبك، وذاكرتك، مما يجعل رؤاك متاحة على مدار الساعة. فوّض المهام لذكاء اصطناعي يفكر حقًا مثلك، مما يحررك لتحقيق المزيد مع ضمان بقاء حكمتك المهنية دائمًا في متناول اليد، دون أن تُنسى."
   },
   "featuresheader": {
     "title": "قائمة الميزات",
@@ -27,7 +27,7 @@
       "title": "طرح الأسئلة",
       "description": "قدّم أسئلتك التجارية مع المستندات الداعمة",
       "content": "قم بتحميل ملفات PDF أو مستندات Word أو Excel مع أسئلتك للحصول على رؤى شاملة مدعومة بالذكاء الاصطناعي ومصممة خصيصاً لاحتياجات عملك المحددة.",
-      "buttonText": "اسأل كروكو"
+      "buttonText": "اسأل Croconus"
     },
     "adminResponses": {
       "title": "ردود المشرف",
@@ -37,13 +37,15 @@
     }
   },
   "navbar": {
-    "logo_title": "تطبيق كروكو", 
+    "home": "الصفحة الرئيسية",
+    "logo_title": "Croconus", 
     "login_link": "تسجيل الدخول",
     "logout_button": "تسجيل الخروج",
     "clients_link": "العملاء",
-    "ask_faleh_link": "اسأل كروكو", 
+    "ask_faleh_link": " Croconus اسأل", 
     "resources_link": "الموارد",
-    "control_panel_link": "لوحة التحكم"
+    "control_panel_link": "لوحة التحكم",
+    "digital_copy_link": "النسخ الرقمية"
   },
   "login": {
     "title": "تسجيل الدخول",
@@ -136,6 +138,111 @@
       "qa_guideline": "دليل ضمان الجودة",
       "branding_guideline": "دليل العلامة التجارية",
       "other_docs": "جميع المستندات الأخرى المحتملة"
+    }
+  },
+  "admin": {
+    "personas": {
+      "title": "قائمة النسخ الرقمية",
+      "header": "نسخك الرقمية",
+      "description": "إدارة وتفاعل مع جميع شخصيات الذكاء الاصطناعي التي أنشأتها.",
+      "new_button": "إنشاء نسخة جديدة",
+      "empty_state_message": "لم تقم بإنشاء أي نسخ رقمية بعد.",
+      "empty_state_button": "ابدأ بإنشاء واحدة",
+      "loading": "جاري تحميل النسخ الرقمية...",
+      "error_auth_missing": "لا يوجد رمز مصادقة متاح لهذا الطلب. يرجى تسجيل الدخول.",
+      "error_session_expired": "انتهت الجلسة أو الرمز غير صالح. يرجى تسجيل الدخول مرة أخرى.",
+      "error_delete_auth_failed": "انتهت الجلسة أو الرمز غير صالح. يرجى تسجيل الدخول مرة أخرى للحذف.",
+      "error_fetch_failed": "فشل في جلب قائمة الشخصيات.",
+      "error_delete_failed": "فشل في حذف النسخة الرقمية: {message}",
+      "error_unknown_fetch": "تعذر تحميل قائمة النسخ الرقمية. يرجى التحقق من اتصال الواجهة الخلفية.",
+      "error_unknown_delete": "فشل في حذف النسخة الرقمية: خطأ غير معروف",
+      "error_try_reloading": "حاول إعادة التحميل",
+      "error_go_to_login": "اذهب إلى تسجيل الدخول",
+      "delete_confirm": "هل أنت متأكد أنك تريد حذف النسخة الرقمية بالمعرف {id}؟ هذا الإجراء دائم."
+    }
+  },
+  "persona_card": {
+    "role_prefix": "الدور",
+    "details_button": "التفاصيل",
+    "chat_button": "الدردشة",
+    "knowledge_button": "المعرفة",
+    "delete_button": "حذف",
+    "status": {
+      "active": "نشط",
+      "processing": "جاري المعالجة",
+      "queued": "في قائمة الانتظار",
+      "failed": "فشل",
+      "unknown": "غير معروف"
+    },
+    "actions_disabled_prefix": "الإجراءات معطلة: الحالة هي",
+    "actions_disabled_suffix": "",
+    "deleting": "جاري الحذف"
+  },
+  "digital_copy": {
+    "title": "أنشئ نسختك الرقمية",
+    "description": "اتبع الخطوات لتحديد الهوية والمعرفة والأسلوب لشخصية الذكاء الاصطناعي الخاصة بك.",
+    "note": "تستخدم هذه العملية Ollama و Mistral لإنشاء وكيل مخصص مدعوم بتقنية RAG.",
+    "auth_error": "أنت غير مصادق. يرجى تسجيل الدخول لإنشاء نسخة رقمية.",
+    "build_fail_prefix": "فشل في بدء الإنشاء (الحالة:",
+    "build_fail_suffix": ").",
+    "unknown_build_error": "فشل في بدء الإنشاء: خطأ غير معروف."
+  },
+  "digital_copy_wizard": {
+    "step1": {
+      "title": "الخطوة 1: الهوية الأساسية والمظهر",
+      "avatar_section_title": "الصورة الرمزية الرقمية (اختياري)",
+      "avatar_upload_description": "للحصول على أفضل النتائج، يرجى تحميل **صورة واضحة وعالية الدقة**.",
+      "remove_avatar_button": "إزالة الصورة الرمزية",
+      "persona_name_label": "اسم الشخصية (نسخة من من؟)",
+      "persona_name_placeholder": "مثال: جين سميث",
+      "persona_role_label": "دور الشخصية (خبرتهم/المسمى الوظيفي)",
+      "persona_role_placeholder": "مثال: خبير تسويق، مستشار امتياز",
+      "persona_tone_label": "نبرة المحادثة المفضلة",
+      "tone_professional": "احترافية ورسمية",
+      "tone_friendly": "ودودة وغير رسمية",
+      "tone_expert": "خبير وموثوقة",
+      "tone_concise": "مباشرة وموجزة"
+    },
+    "step2": {
+      "title": "الخطوة 2: قاعدة المعرفة",
+      "description": "قدم مواد مصدر لتعليم الذكاء الاصطناعي أسلوب الشخصية وحقائقها وآرائها.",
+      "text_input_title": "1. لصق نص عينة / نصوص",
+      "text_input_placeholder": "مثال: 'أعتقد أن بايثون أفضل لخطوط أنابيب RAG لأن...'",
+      "file_upload_title": "2. تحميل المستندات (.txt, .pdf, .md)",
+      "files_selected": "الملفات المحددة: {count}",
+      "external_sources_title": "3. ربط مصادر البيانات الخارجية (ميزة مستقبلية)",
+      "email_integration": "الاندماج مع أرشيف Gmail/البريد الإلكتروني (قريباً)",
+      "twitter_integration": "ربط حساب X (تويتر) (قريباً)",
+      "external_sources_note": "تسمح عمليات الدمج الخارجية للذكاء الاصطناعي بالتعلم من اتصالاتك في الوقت الفعلي."
+    },
+    "step3": {
+      "title": "الخطوة 3: التأكيد",
+      "summary_header": "ملخص النسخة الرقمية:",
+      "avatar_selected": "الصورة الرمزية المحددة:",
+      "avatar_yes": "نعم ({name})",
+      "avatar_no": "لا",
+      "persona_name": "اسم الشخصية:",
+      "not_set": "لم يتم التعيين",
+      "role_expertise": "الدور/الخبرة:",
+      "conversational_tone": "نبرة المحادثة:",
+      "knowledge_files": "ملفات المعرفة:",
+      "files_uploaded": "{count} ملف (ملفات) تم تحميلها",
+      "none": "لا يوجد",
+      "knowledge_text": "نص المعرفة:",
+      "text_input_summary": "مدخلات نصية ({count} حرف)",
+      "warning_message": "**تحذير:** سيبدأ بناء النسخة في تضمين المتجهات والتدريب، وقد يستغرق ذلك بضع دقائق."
+    },
+    "navigation": {
+      "back_button": "رجوع",
+      "next_button": "التالي",
+      "build_button": "بناء النسخة الرقمية",
+      "building_button": "جاري البناء...",
+      "step_indicator": "الخطوة {current} من {total}"
+    },
+    "errors": {
+      "name_role_required": "يرجى تقديم اسم ودور الشخصية للمتابعة.",
+      "build_initiation_error": "خطأ في بدء البناء: {message}",
+      "unknown_network_error": "حدث خطأ غير معروف في الشبكة."
     }
   }
 }

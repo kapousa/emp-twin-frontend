@@ -1,8 +1,8 @@
 {
   "homeTitle": "项目 X",
   "hero": {
-    "title": "欢迎来到 Croco",
-    "description": "一个由人工智能驱动的平台，帮助您获得商业问题的智能解答。上传文档并接收由全面研究支持的专家回复。"
+    "title": "用Croconus扩展您的独特专业知识",
+    "description": "创建一个学习您的知识、风格和记忆的数字副本，让您的见解24/7随时可用。将任务委托给真正像你一样思考的AI，让你实现更多，同时确保您的专业智慧始终触手可及，永不遗忘。"
   },
   "featuresheader": {
     "title": "功能列表",
@@ -27,7 +27,7 @@
       "title": "提出问题",
       "description": "提交您的商业问题及支持文档",
       "content": "上传 PDF、Word 或 Excel 文件以及您的问题，以获取针对您的特定业务需求量身定制的全面人工智能洞察。",
-      "buttonText": "提问 Croco"
+      "buttonText": "提问 Croconus"
     },
     "adminResponses": {
       "title": "管理员回复",
@@ -37,11 +37,12 @@
     }
   },
   "navbar": {
-    "logo_title": "Croco 应用", 
+    "home": "首页",
+    "logo_title": "Croconus 应用", 
     "login_link": "登录",
     "logout_button": "登出",
     "clients_link": "客户",
-    "ask_faleh_link": "提问 Croco", 
+    "ask_faleh_link": "提问 Croconus", 
     "resources_link": "资源",
     "control_panel_link": "控制面板"
   },

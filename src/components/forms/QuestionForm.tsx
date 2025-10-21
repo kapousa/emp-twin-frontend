@@ -36,7 +36,9 @@ const QuestionForm = ({
               <Bot className="h-8 w-8 text-primary mt-1" />
             )}
             <div
-              className={`p-3 rounded-xl max-w-2/3 ${
+              // --- CHANGE APPLIED HERE ---
+              // Increased max-w-2/3 (66.6%) to max-w-[80%] to allow message bubbles to be wider.
+              className={`p-3 rounded-xl max-w-[80%] ${ 
                 msg.sender === "user"
                   ? "bg-primary text-primary-foreground rounded-br-none"
                   : "bg-muted rounded-bl-none"

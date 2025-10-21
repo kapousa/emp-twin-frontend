@@ -281,7 +281,7 @@ const AskPanel = () => {
     <div className="w-full min-h-[calc(100vh-4rem)] bg-background">
       <div className="max-w-[90vw] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8">
-          {/* Using the translated Navbar key, which is Ask Croco */}
+          {/* Using the translated Navbar key, which is Ask Croconus */}
           <h1 className="text-3xl font-bold text-foreground mb-4">{t("navbar.ask_faleh_link")}</h1> 
         </div>
 

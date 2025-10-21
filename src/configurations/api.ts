@@ -16,3 +16,8 @@ export const AUTH_VERIFY_ENDPOINT: string = `${AUTH_ENDPOINT}/verify`;
 // Agent APIs
 export const AGENT_ENDPOINT: string = `${API_BASE_URL}/agent`;
 export const AGENT_ASK_ENDPOINT: string = `${AGENT_ENDPOINT}/ask`;
+
+// Persona APIs
+export const PERSONA_ENDPOINT: string = `${API_BASE_URL}/persona`;
+export const PERSONA_BUILD_ENDPOINT: string = `${PERSONA_ENDPOINT}/build`;
+export const PERSONA_LIST_ENDPOINT: string = `${PERSONA_ENDPOINT}/list`;
