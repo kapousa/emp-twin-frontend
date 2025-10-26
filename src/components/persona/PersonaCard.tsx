@@ -14,7 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next'; // Import useTranslation
 
-// Define the expected structure of a Persona object
+// Define the euyxpected structure of a Persona object
 interface Persona {
   id: string; // Changed to string (UUID)
   personaName: string;
