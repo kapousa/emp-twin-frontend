@@ -12,6 +12,7 @@ import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "./contexts/AuthProvider";
 import Login from "./pages/Login";
+import PersonaEditPage from "./pages/PersonaEdit";
 // --- NEW IMPORT ---
 import DigitalCopyPage from "./pages/DigitalCopy";
 import PersonaListPage from "./pages/PersonaList";
@@ -50,17 +51,19 @@ const App = () => (
               <Route path="/ask" element={<ProtectedRoute><AskPanel /></ProtectedRoute>} />
               <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/upload" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
-              
+
               {/* --- NEW PROTECTED ROUTE FOR DIGITAL COPY --- */}
-              <Route 
-                path="/admin/digital-copy" 
-                element={<ProtectedRoute><DigitalCopyPage /></ProtectedRoute>} 
+              <Route
+                path="/admin/digital-copy"
+                element={<ProtectedRoute><DigitalCopyPage /></ProtectedRoute>}
               />
-              <Route 
-                path="/persona/list" 
-                element={<ProtectedRoute><PersonaListPage /></ProtectedRoute>} 
+              <Route
+                path="/persona/list"
+                element={<ProtectedRoute><PersonaListPage /></ProtectedRoute>}
               />
-              
+              <Route path="persona/:id/details"
+                element={<ProtectedRoute><PersonaEditPage /></ProtectedRoute>}
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

@@ -1,7 +1,7 @@
 {
   "homeTitle": "مشروع X",
   "hero": {
-    "title": " Croconus قم بتوسيع خبراتك الفريدة مع",
+    "title": "قم بتوسيع خبراتك الفريدة مع Croconus",
     "description": "أنشئ نسخة رقمية تتعلم معرفتك، أسلوبك، وذاكرتك، مما يجعل رؤاك متاحة على مدار الساعة. فوّض المهام لذكاء اصطناعي يفكر حقًا مثلك، مما يحررك لتحقيق المزيد مع ضمان بقاء حكمتك المهنية دائمًا في متناول اليد، دون أن تُنسى."
   },
   "featuresheader": {
@@ -38,11 +38,11 @@
   },
   "navbar": {
     "home": "الصفحة الرئيسية",
-    "logo_title": "Croconus", 
+    "logo_title": "Croconus",
     "login_link": "تسجيل الدخول",
     "logout_button": "تسجيل الخروج",
     "clients_link": "العملاء",
-    "ask_faleh_link": " Croconus اسأل", 
+    "ask_faleh_link": "اسأل Croconus",
     "resources_link": "الموارد",
     "control_panel_link": "لوحة التحكم",
     "digital_copy_link": "النسخ الرقمية"
@@ -230,7 +230,7 @@
       "none": "لا يوجد",
       "knowledge_text": "نص المعرفة:",
       "text_input_summary": "مدخلات نصية ({count} حرف)",
-      "warning_message": "**تحذير:** سيبدأ بناء النسخة في تضمين المتجهات والتدريب، وقد يستغرق ذلك بضع دقائق."
+      "warning_message": "تم إنشاء الشخصية بنجاح وستكون نشطة قريبًا. ستتلقى إشعارًا على بريدك الإلكتروني المسجل عندما تصبح جاهزة للاستخدام."
     },
     "navigation": {
       "back_button": "رجوع",
@@ -243,6 +243,37 @@
       "name_role_required": "يرجى تقديم اسم ودور الشخصية للمتابعة.",
       "build_initiation_error": "خطأ في بدء البناء: {message}",
       "unknown_network_error": "حدث خطأ غير معروف في الشبكة."
+    }
+  },
+  "persona_edit": {
+    "document_title": "تعديل الشخصية",
+    "title": "تعديل الشخصية: {{personaName}}",
+    "error": {
+      "missing_id": "خطأ: معرف الشخصية مفقود من الرابط.",
+      "auth_missing": "رمز المصادقة مفقود. يرجى تسجيل الدخول.",
+      "session_expired": "انتهت صلاحية جلستك أو أنها غير صالحة. يرجى تسجيل الدخول مرة أخرى.",
+      "fetch_failed": "فشل تحميل تفاصيل الشخصية: {{message}}",
+      "unknown": "حدث خطأ غير معروف.",
+      "auth_missing_update": "رمز المصادقة مفقود للتحديث. يرجى تسجيل الدخول.",
+      "session_expired_update": "انتهت صلاحية جلستك أثناء التحديث. يرجى تسجيل الدخول مرة أخرى.",
+      "update_failed": "فشل تحديث تفاصيل الشخصية: {{message}}",
+      "unknown_update": "حدث خطأ غير معروف أثناء التحديث.",
+      "persona_not_found": "لم يتم العثور على الشخصية. ربما تم حذفها أو أنها غير موجودة."
+    },
+    "loading_details": "جارٍ تحميل تفاصيل الشخصية...",
+    "no_changes_toast": "لم يتم اكتشاف أي تغييرات. لا يوجد شيء للحفظ.",
+    "update_success_toast": "تم تحديث الشخصية بنجاح!",
+    "update_error_toast": "فشل تحديث الشخصية.",
+    "back_to_list_button": "العودة إلى قائمة الشخصيات",
+    "cancel_button": "إلغاء",
+    "save_changes_button": "حفظ التغييرات",
+    "form": {
+      "name_label": "اسم الشخصية",
+      "role_label": "دور الشخصية",
+      "tone_label": "نبرة الشخصية",
+      "select_tone_placeholder": "اختر نبرة",
+      "knowledge_text_label": "نص المعرفة",
+      "knowledge_text_description": "قدم المعلومات الأساسية حول الشخصية، ما تعرفه، وخلفيتها."
     }
   }
 }

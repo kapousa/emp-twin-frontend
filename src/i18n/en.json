@@ -1,5 +1,4 @@
-
-  {
+{
   "homeTitle": "Croconus",
   "hero": {
     "title": "Scale your unique expertise with Croconus",
@@ -131,19 +130,6 @@
     },
     "quick_actions": {
       "label": "Quick Action Generator (Optional)"
-    },
-    "docs": {
-      "business_plan": "Business Plan",
-      "franchise_manual": "Franchise Manual",
-      "staff_manual": "Staff Manual",
-      "qa_guideline": "Quality Assurance Guideline",
-      "branding_guideline": "Branding Guideline",
-      "other_docs": "All other possible documents"
-    },
-    "digital_copy": {
-      "title": "Create Your Digital Copy",
-      "description": "Follow the steps to define the identity, knowledge, and style for your AI persona.",
-      "note": "The process uses Ollama and Mistral to create a dedicated RAG-powered agent."
     }
   },
   "admin": {
@@ -236,7 +222,7 @@
       "none": "None",
       "knowledge_text": "Knowledge Text:",
       "text_input_summary": "Text Input ({count} chars)",
-      "warning_message": "**Warning:** Building the copy will start vector embedding and training, which may take a few minutes."
+      "warning_message":  "The persona has been successfully created and will be active soon. You will receive a notification at your registered email when it is ready to use."
     },
     "navigation": {
       "back_button": "Back",

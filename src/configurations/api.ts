@@ -21,3 +21,6 @@ export const AGENT_ASK_ENDPOINT: string = `${AGENT_ENDPOINT}/ask`;
 export const PERSONA_ENDPOINT: string = `${API_BASE_URL}/persona`;
 export const PERSONA_BUILD_ENDPOINT: string = `${PERSONA_ENDPOINT}/build`;
 export const PERSONA_LIST_ENDPOINT: string = `${PERSONA_ENDPOINT}/list`;
+export const getPersonaDetailsEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/details`;
+export const getPersonaUpdateEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/update`;
+export const getPersonaDeleteEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/delete`;
