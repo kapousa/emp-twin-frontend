@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "./contexts/AuthProvider";
 import Login from "./pages/Login";
 import PersonaEditPage from "./pages/PersonaEdit";
+import PersonaChatPage from "./pages/PersonaChat";
 // --- NEW IMPORT ---
 import DigitalCopyPage from "./pages/DigitalCopy";
 import PersonaListPage from "./pages/PersonaList";
@@ -63,6 +64,9 @@ const App = () => (
               />
               <Route path="persona/:id/details"
                 element={<ProtectedRoute><PersonaEditPage /></ProtectedRoute>}
+              />
+              <Route path="persona/:id/chat"
+                element={<ProtectedRoute><PersonaChatPage /></ProtectedRoute>}
               />
               <Route path="*" element={<NotFound />} />
             </Routes>

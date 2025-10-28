@@ -42,7 +42,7 @@
     "login_link": "تسجيل الدخول",
     "logout_button": "تسجيل الخروج",
     "clients_link": "العملاء",
-    "ask_faleh_link": "اسأل Croconus",
+    "ask_persona_link": "اسأل الشخصية",
     "resources_link": "الموارد",
     "control_panel_link": "لوحة التحكم",
     "digital_copy_link": "النسخ الرقمية"
@@ -80,25 +80,27 @@
       "description": "فشل في نسخ النص."
     },
     "download_start": {
-      "title": "جاري التحميل...",
-      "description": "يجب أن يبدأ تنزيل الفيديو قريباً."
+      "title": "بدأ التنزيل",
+      "description": "يجب أن يبدأ تنزيل الفيديو الخاص بك قريبًا."
     },
     "video_generating": {
-      "title": "جاري إنشاء الفيديو...",
-      "description": "يتم إنشاء الفيديو وسيظهر هنا بمجرد أن يصبح جاهزاً."
+      "title": "جاري إنشاء الفيديو",
+      "description": "يرجى الانتظار بينما يتم إنشاء إجابة الفيديو الخاصة بك."
     },
     "video_ready": {
       "title": "الفيديو جاهز!",
-      "description": "تم تحميل الفيديو من الواجهة الخلفية (Backend)."
+      "description": "إجابة الفيديو الخاصة بك متاحة الآن."
     },
     "question_sent": {
-      "title": "تم إرسال السؤال!",
-      "description": "تم استلام الإجابة."
+      "title": "تم إرسال السؤال",
+      "description": "تم إرسال رسالتك."
     },
     "submission_failed": {
-      "title": "فشل الإرسال"
+      "title": "فشل الإرسال",
+      "description": "فشل الحصول على رد من الشخصية."
     },
-    "unexpected_error_short": "الرجاء المحاولة مرة أخرى لاحقاً."
+    "unexpected_error_short": "حدث خطأ غير متوقع.",
+    "error": "خطأ"
   },
   "askpanel": {
     "chat_start": {
@@ -249,6 +251,7 @@
     "document_title": "تعديل الشخصية",
     "title": "تعديل الشخصية: {{personaName}}",
     "error": {
+      "title": "خطأ",
       "missing_id": "خطأ: معرف الشخصية مفقود من الرابط.",
       "auth_missing": "رمز المصادقة مفقود. يرجى تسجيل الدخول.",
       "session_expired": "انتهت صلاحية جلستك أو أنها غير صالحة. يرجى تسجيل الدخول مرة أخرى.",
@@ -258,7 +261,8 @@
       "session_expired_update": "انتهت صلاحية جلستك أثناء التحديث. يرجى تسجيل الدخول مرة أخرى.",
       "update_failed": "فشل تحديث تفاصيل الشخصية: {{message}}",
       "unknown_update": "حدث خطأ غير معروف أثناء التحديث.",
-      "persona_not_found": "لم يتم العثور على الشخصية. ربما تم حذفها أو أنها غير موجودة."
+      "persona_not_found": "لم يتم العثور على الشخصية. ربما تم حذفها أو أنها غير موجودة.",
+      "no_persona_data": "لا توجد بيانات شخصية متاحة."
     },
     "loading_details": "جارٍ تحميل تفاصيل الشخصية...",
     "no_changes_toast": "لم يتم اكتشاف أي تغييرات. لا يوجد شيء للحفظ.",
@@ -267,6 +271,10 @@
     "back_to_list_button": "العودة إلى قائمة الشخصيات",
     "cancel_button": "إلغاء",
     "save_changes_button": "حفظ التغييرات",
+    "status_not_ready": {
+      "title": "الشخصية ليست جاهزة",
+      "description": "حالة هذه الشخصية هي '{{status}}'. يجب أن تكون 'جاهزة' للدردشة. جاري إعادة التوجيه إلى إدارة الشخصيات."
+    },
     "form": {
       "name_label": "اسم الشخصية",
       "role_label": "دور الشخصية",
@@ -275,5 +283,52 @@
       "knowledge_text_label": "نص المعرفة",
       "knowledge_text_description": "قدم المعلومات الأساسية حول الشخصية، ما تعرفه، وخلفيتها."
     }
-  }
+  },
+  "personachat": {
+    "ask_persona_link": "اسأل الشخصية",
+    "chat_start": {
+      "title": "ابدأ الدردشة مع",
+      "description": "اكتب رسالتك أدناه أو اختر إجراءً سريعًا لبدء محادثتك. الشخصية هنا لمساعدتك!",
+      "tone_label": "نبرة الشخصية"
+    },
+    "input_placeholder": "اكتب رسالتك هنا...",
+    "generate_video_label": "إنشاء إجابة فيديو",
+    "send_button": "إرسال",
+    "sending_button": "جاري الإرسال...",
+    "bot_thinking": "الشخصية تفكر...",
+    "conversations": {
+      "header": "المحادثات",
+      "example_chat": "محادثة مثال",
+      "project_analysis": "تحليل المشروع"
+    },
+    "options_header": "الخيارات والأدوات",
+    "docs_upload": {
+      "label": "المستندات الداعمة",
+      "text": "اسحب وأفلت بعض الملفات هنا، أو انقر لتحديد الملفات",
+      "selected_files_label": "الملفات المحددة:",
+      "formats": "جميع انواع الملفات"
+    },
+    "quick_actions": {
+      "label": "إجراءات سريعة"
+    },
+    "tips": {
+      "header": "نصائح لتفاعل أفضل",
+      "tip1": "كن واضحًا ومختصرًا في أسئلتك.",
+      "tip2": "قدم السياق للاستفسارات المعقدة.",
+      "tip3": "جرب أسئلة مختلفة.",
+      "tip4": "استخدم الإجراءات السريعة للمهام الشائعة."
+    },
+    "bot_fallback_error": "أعتذر، لم أتمكن من إنشاء رد. يرجى المحاولة مرة أخرى أو إعادة صياغة استفسارك.",
+    "error_prefix": "خطأ",
+    "error": {
+      "persona_not_loaded": "لم يتم تحميل تفاصيل الشخصية. يرجى تحديث الصفحة."
+    },
+    "document_title_chat": "الدردشة مع الشخصية",
+    "persona_role_desc": "الدور المهني لهذه الشخصية.",
+    "persona_tone_desc": "نبرة التواصل التي تستخدمها هذه الشخصية."
+  },
+  "Generate Resume": "إنشاء سيرة ذاتية",
+  "Generate Intro Video": "إنشاء فيديو تعريفي",
+  "Reply to my today's Emails": "الرد على رسائل البريد الإلكتروني لهذا اليوم",
+  "Send message to freind": "إرسال رسالة إلى صديق"
 }

@@ -24,3 +24,5 @@ export const PERSONA_LIST_ENDPOINT: string = `${PERSONA_ENDPOINT}/list`;
 export const getPersonaDetailsEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/details`;
 export const getPersonaUpdateEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/update`;
 export const getPersonaDeleteEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/delete`;
+export const getPersonaChatEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/chat`;
+export const getPersonaAnswerEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/ask`;

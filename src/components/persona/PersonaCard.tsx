@@ -104,7 +104,7 @@ const PersonaCard = ({ persona, onDelete, isDeleting }: PersonaCardProps) => {
           </Link>
 
           {/* 2. Chat with Persona */}
-          <Link to={`/ask?personaId=${persona.id}`}>
+          <Link to={`/persona/${persona.id}/chat?persona=${persona.persona_name}`}>
             <Button size="sm" className="w-full" disabled={isActionDisabled}>
               <MessageSquare className="h-4 w-4 mr-2" /> {t("persona_card.chat_button")}
             </Button>

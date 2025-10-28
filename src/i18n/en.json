@@ -42,7 +42,7 @@
     "login_link": "Login",
     "logout_button": "Logout",
     "clients_link": "Clients",
-    "ask_faleh_link": "Ask Croconus",
+    "ask_persona_link": "Ask Persona",
     "resources_link": "Resources",
     "control_panel_link": "Control Panel",
     "digital_copy_link": "Digital Copies"
@@ -80,25 +80,27 @@
       "description": "Failed to copy text."
     },
     "download_start": {
-      "title": "Downloading...",
-      "description": "Video download should begin shortly."
+      "title": "Download Started",
+      "description": "Your video download should begin shortly."
     },
     "video_generating": {
-      "title": "Generating video...",
-      "description": "The video is being generated and will appear here once it is ready."
+      "title": "Generating Video",
+      "description": "Please wait while your video answer is being generated."
     },
     "video_ready": {
-      "title": "Video ready!",
-      "description": "Video has been loaded from the backend."
+      "title": "Video Ready!",
+      "description": "Your video answer is now available."
     },
     "question_sent": {
-      "title": "Question sent!",
-      "description": "Answer received."
+      "title": "Question Sent",
+      "description": "Your message has been sent."
     },
     "submission_failed": {
-      "title": "Submission failed"
+      "title": "Submission Failed",
+      "description": "Failed to get a response from the persona."
     },
-    "unexpected_error_short": "Please try again later."
+    "unexpected_error_short": "An unexpected error occurred. Please try again later.",
+    "error": "Error"
   },
   "askpanel": {
     "chat_start": {
@@ -249,6 +251,7 @@
     "document_title": "Edit Persona",
     "title": "Edit Persona: {{personaName}}",
     "error": {
+      "title": "Error",
       "missing_id": "Error: Persona ID is missing from the URL.",
       "auth_missing": "Authentication token is missing. Please log in.",
       "session_expired": "Your session has expired or is invalid. Please log in again.",
@@ -258,7 +261,8 @@
       "session_expired_update": "Your session has expired during update. Please log in again.",
       "update_failed": "Failed to update persona details: {{message}}",
       "unknown_update": "An unknown error occurred during update.",
-      "persona_not_found": "Persona not found. It may have been deleted or does not exist."
+      "persona_not_found": "Persona not found. It may have been deleted or does not exist.",
+      "no_persona_data": "No persona data available."
     },
     "loading_details": "Loading persona details...",
     "no_changes_toast": "No changes detected. Nothing to save.",
@@ -267,6 +271,10 @@
     "back_to_list_button": "Back to Personas List",
     "cancel_button": "Cancel",
     "save_changes_button": "Save Changes",
+    "status_not_ready": {
+      "title": "Persona Not Ready",
+      "description": "This persona's status is '{{status}}'. It must be 'ready' to chat. Redirecting to persona management."
+    },
     "form": {
       "name_label": "Persona Name",
       "role_label": "Persona Role",
@@ -275,5 +283,52 @@
       "knowledge_text_label": "Knowledge Text",
       "knowledge_text_description": "Provide core information about the persona, what it knows, and its background."
     }
-  }
+  },
+  "personachat": {
+    "ask_persona_link": "Ask Persona",
+    "chat_start": {
+      "title": "Start chatting with",
+      "description": "Type your message below or choose a quick action to begin your conversation. Persona is here to help!",
+      "tone_label": "Persona Tone"
+    },
+    "input_placeholder": "Type your message here...",
+    "generate_video_label": "Generate Video Answer",
+    "send_button": "Send",
+    "sending_button": "Sending...",
+    "bot_thinking": "Persona is thinking...",
+    "conversations": {
+      "header": "Conversations",
+      "example_chat": "Example Chat",
+      "project_analysis": "Project Analysis"
+    },
+    "options_header": "Options & Tools",
+    "docs_upload": {
+      "label": "Supporting Documents",
+      "text": "Drag 'n' drop some files here, or click to select files",
+      "selected_files_label": "Selected Files:",
+      "formats": "Any file types"
+    },
+    "quick_actions": {
+      "label": "Quick Actions"
+    },
+    "tips": {
+      "header": "Tips for better interaction",
+      "tip1": "Be clear and concise with your questions.",
+      "tip2": "Provide context for complex queries.",
+      "tip3": "Experiment with different questions.",
+      "tip4": "Use quick actions for common tasks."
+    },
+    "bot_fallback_error": "I apologize, I wasn't able to generate a response. Please try again or rephrase your query.",
+    "error_prefix": "Error",
+    "error": {
+      "persona_not_loaded": "Persona details not loaded. Please refresh the page."
+    },
+    "document_title_chat": "Chat with Persona",
+    "persona_role_desc": "The professional role of this persona.",
+    "persona_tone_desc": "The communication tone this persona uses."
+  },
+  "Generate Resume": "Generate Resume",
+  "Generate Intro Video": "Generate Intro Video",
+  "Reply to my today's Emails": "Reply to my today's Emails",
+  "Send message to freind": "Send message to freind"
 }
