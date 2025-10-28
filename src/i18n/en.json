@@ -1,8 +1,8 @@
 {
-  "homeTitle": "Croconus",
+  "homeTitle": "Project X",
   "hero": {
     "title": "Scale your unique expertise with Croconus",
-    "description": "Create a Digital Copy that learns your knowledge, style, and memory, making your insights instantly available 24/7. Delegate tasks to an AI that truly thinks like you, freeing you to achieve more while ensuring your professional wisdom is always at hand, never forgotten."
+    "description": "Create a Digital Copy that learns your knowledge, style, and memory, making your insights available 24/7. Delegate tasks to an AI that truly thinks like you, freeing you to achieve more while ensuring your professional wisdom is always at hand, never forgotten."
   },
   "featuresheader": {
     "title": "Features List",
@@ -15,7 +15,7 @@
     },
     "aiAnalysis": {
       "title": "AI-Powered Analysis",
-      "description": "Intelligent responses based on your documents"
+      "description": "Smart responses based on your documents"
     },
     "expertSupport": {
       "title": "Expert Support",
@@ -45,7 +45,7 @@
     "ask_faleh_link": "Ask Croconus",
     "resources_link": "Resources",
     "control_panel_link": "Control Panel",
-    "digital_copy_link": "Digital Copy"
+    "digital_copy_link": "Digital Copies"
   },
   "login": {
     "title": "Login",
@@ -130,6 +130,14 @@
     },
     "quick_actions": {
       "label": "Quick Action Generator (Optional)"
+    },
+    "docs": {
+      "business_plan": "Business Plan",
+      "franchise_manual": "Franchise Manual",
+      "staff_manual": "Staff Manual",
+      "qa_guideline": "Quality Assurance Guideline",
+      "branding_guideline": "Branding Guideline",
+      "other_docs": "All other possible documents"
     }
   },
   "admin": {
@@ -222,7 +230,7 @@
       "none": "None",
       "knowledge_text": "Knowledge Text:",
       "text_input_summary": "Text Input ({count} chars)",
-      "warning_message":  "The persona has been successfully created and will be active soon. You will receive a notification at your registered email when it is ready to use."
+      "warning_message": "The persona has been successfully created and will be active soon. You will receive a notification at your registered email when it is ready to use."
     },
     "navigation": {
       "back_button": "Back",
@@ -235,6 +243,37 @@
       "name_role_required": "Please provide the Persona Name and Role to continue.",
       "build_initiation_error": "Error initiating the build: {message}",
       "unknown_network_error": "An unknown network error occurred."
+    }
+  },
+  "persona_edit": {
+    "document_title": "Edit Persona",
+    "title": "Edit Persona: {{personaName}}",
+    "error": {
+      "missing_id": "Error: Persona ID is missing from the URL.",
+      "auth_missing": "Authentication token is missing. Please log in.",
+      "session_expired": "Your session has expired or is invalid. Please log in again.",
+      "fetch_failed": "Failed to load persona details: {{message}}",
+      "unknown": "An unknown error occurred.",
+      "auth_missing_update": "Authentication token is missing for update. Please log in.",
+      "session_expired_update": "Your session has expired during update. Please log in again.",
+      "update_failed": "Failed to update persona details: {{message}}",
+      "unknown_update": "An unknown error occurred during update.",
+      "persona_not_found": "Persona not found. It may have been deleted or does not exist."
+    },
+    "loading_details": "Loading persona details...",
+    "no_changes_toast": "No changes detected. Nothing to save.",
+    "update_success_toast": "Persona updated successfully!",
+    "update_error_toast": "Failed to update persona.",
+    "back_to_list_button": "Back to Personas List",
+    "cancel_button": "Cancel",
+    "save_changes_button": "Save Changes",
+    "form": {
+      "name_label": "Persona Name",
+      "role_label": "Persona Role",
+      "tone_label": "Persona Tone",
+      "select_tone_placeholder": "Select a tone",
+      "knowledge_text_label": "Knowledge Text",
+      "knowledge_text_description": "Provide core information about the persona, what it knows, and its background."
     }
   }
 }
