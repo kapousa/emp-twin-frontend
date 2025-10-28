@@ -45,7 +45,8 @@
     "ask_persona_link": "Ask Persona",
     "resources_link": "Resources",
     "control_panel_link": "Control Panel",
-    "digital_copy_link": "Digital Copies"
+    "digital_copy_link": "Digital Copies",
+    "ask_faleh_link": "Ask Crocuns"
   },
   "login": {
     "title": "Login",
@@ -286,10 +287,10 @@
   },
   "personachat": {
     "ask_persona_link": "Ask Persona",
+    "tone_label": "Persona Tone",
     "chat_start": {
       "title": "Start chatting with",
-      "description": "Type your message below or choose a quick action to begin your conversation. Persona is here to help!",
-      "tone_label": "Persona Tone"
+      "description": "Type your message below or choose a quick action to begin your conversation. Persona is here to help!"
     },
     "input_placeholder": "Type your message here...",
     "generate_video_label": "Generate Video Answer",

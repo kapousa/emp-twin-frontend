@@ -45,7 +45,8 @@
     "ask_persona_link": "اسأل الشخصية",
     "resources_link": "الموارد",
     "control_panel_link": "لوحة التحكم",
-    "digital_copy_link": "النسخ الرقمية"
+    "digital_copy_link": "النسخ الرقمية",
+    "ask_faleh_link": " Crocuns اسال"
   },
   "login": {
     "title": "تسجيل الدخول",
@@ -286,10 +287,10 @@
   },
   "personachat": {
     "ask_persona_link": "اسأل الشخصية",
+    "tone_label": "نبرة الشخصية",
     "chat_start": {
       "title": "ابدأ الدردشة مع",
-      "description": "اكتب رسالتك أدناه أو اختر إجراءً سريعًا لبدء محادثتك. الشخصية هنا لمساعدتك!",
-      "tone_label": "نبرة الشخصية"
+      "description": "اكتب رسالتك أدناه أو اختر إجراءً سريعًا لبدء محادثتك. الشخصية هنا لمساعدتك!"
     },
     "input_placeholder": "اكتب رسالتك هنا...",
     "generate_video_label": "إنشاء إجابة فيديو",

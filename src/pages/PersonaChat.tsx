@@ -319,7 +319,7 @@ const PersonaChatPage = () => {
         <div className="text-center mb-8">
           {/* Kept the original title but the main persona details are in the chat display */}
           <h1 className="text-3xl font-bold text-foreground mb-4">
-            {t("personachat.ask_faleh_link")}
+            {t("personachat.ask_persona_link")}
             {persona ? ` - ${persona.persona_name}` : ""}
           </h1>
         </div>
