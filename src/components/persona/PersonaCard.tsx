@@ -85,7 +85,8 @@ const PersonaCard = ({ persona, onDelete, isDeleting }: PersonaCardProps) => {
           <CardTitle className="text-2xl font-bold">{persona.persona_name}</CardTitle>
           <CardDescription className="flex items-center justify-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <Brain className="h-4 w-4" />
-            <span>{t("persona_card.role_prefix")} {persona.persona_role}</span>
+            <span>{persona.persona_tone}</span>
+            <span>{persona.persona_role}</span>
           </CardDescription>
         </div>
         <div className="mt-3">
