@@ -25,4 +25,17 @@ export const getPersonaDetailsEndpoint = (personaId: string): string => `${PERSO
 export const getPersonaUpdateEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/update`;
 export const getPersonaDeleteEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/delete`;
 export const getPersonaChatEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/chat`;
-export const    getPersonaAnswerEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/ask`;
+export const getPersonaAnswerEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/ask`;
+
+// Chat Session APIs
+export const CHAT_SESSION_ENDPOINT: string = `${API_BASE_URL}/chatsession`;
+export const CHAT_SESSION_START_ENDPOINT: string = `${CHAT_SESSION_ENDPOINT}/start`;
+export const getAllUserSessions = (userId: string): string => `${CHAT_SESSION_ENDPOINT}/${userId}/getall`;
+export const endChatSession = (sessionId: string): string => `${CHAT_SESSION_ENDPOINT}/${sessionId}/end`;
+
+
+// Chat Messages APIs
+export const CHAT_MESSAGES_ENDPOINT: string = `${API_BASE_URL}/chatmessages`;
+export const CHAT_SESSION_START_ENDPOINT: string = `${CHAT_MESSAGES_ENDPOINT}/start`;
+export const getAllUserSessions = (userId: string): string => `${CHAT_MESSAGES_ENDPOINT}/${userId}/getall`;
+export const endChatSession = (sessionId: string): string => `${CHAT_MESSAGES_ENDPOINT}/${sessionId}/end`;
