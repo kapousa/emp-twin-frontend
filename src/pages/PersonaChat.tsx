@@ -13,7 +13,6 @@ import {
   getPersonaDetailsEndpoint, 
   getPersonaAnswerEndpoint, 
   CHAT_SESSION_START_ENDPOINT,
-  // This helper now takes ONLY personaId (backend gets userId from token)
   getSessionsByUserAndPersona, 
   getChatMessagesHistory 
 } from "@/configurations/api";
@@ -198,12 +197,10 @@ const ConversationList = ({
     onSessionListUpdated: () => void;
 }) => {
   const { t } = useTranslation();
-  // We still need user here to trigger fetchSessions when it loads, even if we don't use user.id in the URL
   const { token, user } = useAuth(); 
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   
   const fetchSessions = useCallback(async () => {
-    // We rely on user being truthy to know the context is loaded
     if (!token || !personaId || !user) return; 
 
     try {
@@ -227,7 +224,6 @@ const ConversationList = ({
     } catch (error) {
       console.error("Failed to fetch sessions:", error);
     }
-  // Include user in dependencies to re-run when user context loads after login
   }, [user, token, t, personaId, onSessionListUpdated]); 
 
   useEffect(() => {
@@ -295,6 +291,7 @@ const PersonaChatPage = () => {
   const navigate = useNavigate();
 
   // Helper to start a new chat session
+  // FIX: Enhanced error logging to show the actual backend error in the console.
   const startNewSession = useCallback(async (pId: string): Promise<string | null> => {
     if (!token) return null;
     try {
@@ -305,8 +302,18 @@ const PersonaChatPage = () => {
       });
       return response.data.id as string;
     } catch (error) {
-      console.error("Failed to start new session:", error);
-      toast({ title: t("toast.error"), description: t("toast.session_start_error_desc"), variant: "destructive" });
+      const errorMessage = axios.isAxiosError(error) 
+        ? error.response?.data?.detail || error.message 
+        : "An unexpected network error occurred.";
+        
+      console.error("Failed to start new session (Backend Error):", errorMessage, error);
+      
+      // Show the specific backend error to the user
+      toast({ 
+        title: t("toast.error"), 
+        description: `Failed to start session. Server detail: ${errorMessage}`, 
+        variant: "destructive" 
+      });
       return null;
     }
   }, [token, toast, t]);
@@ -318,12 +325,10 @@ const PersonaChatPage = () => {
     setSessionId(sId);
     
     try {
-      // NOTE: getChatMessagesHistory URL is fixed in api.ts to use /history
       const response = await axios.get(getChatMessagesHistory(sId), {
         headers: { Authorization: `Bearer ${token}` },
       });
       
-      // Assuming backend returns history in the correct Message format
       const history: Message[] = response.data.map((msg: any) => ({
         id: msg.id,
         sender: msg.sender === 'user' ? 'user' : 'bot', 
@@ -359,13 +364,11 @@ const PersonaChatPage = () => {
   }, [fetchPersonaDetails]);
 
   // Function to check for existing history before creating a new session
-  // FIX: Removed uId parameter, as user ID is no longer passed to the API call.
   const fetchAndInitSession = useCallback(async (pId: string) => { 
     if (!token) return;
 
     try {
         // 1. Check for existing sessions using the filtered API
-        // FIX: The function call now only passes persona ID. Backend uses the token for user ID.
         const response = await axios.get(getSessionsByUserAndPersona(pId), { 
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -378,7 +381,7 @@ const PersonaChatPage = () => {
             const latestSession = existingSessions[0];
             await loadConversationHistory(latestSession.id); 
         } else {
-            // 3. No sessions found, start a new one
+            // 3. No sessions found, start a new one (will use enhanced startNewSession)
             const newSessionId = await startNewSession(pId);
             if (newSessionId) {
                 setSessionId(newSessionId);
@@ -389,29 +392,19 @@ const PersonaChatPage = () => {
 
     } catch (error) {
         console.error("Failed to fetch sessions for initialization:", error);
-        // Fallback: Start a new session if fetching the list failed
+        // Fallback: Start a new session if fetching the list failed (will use enhanced startNewSession)
         const newSessionId = await startNewSession(pId);
         if (newSessionId) setSessionId(newSessionId);
     }
-  // Removed getSessionsByUserAndPersona from dependencies as it is imported (should be stable)
   }, [token, startNewSession, loadConversationHistory]); 
 
 
   // Initialization Effect: Runs once when persona, user, and token are ready
   useEffect(() => {
-    // 1. Temporary Debugging: Keep this to see when the component is ready
-    console.log("Persona ID:", persona?.id);
-    console.log("User ID:", user?.id); // CRITICAL: This must eventually be a string
-    console.log("Session ID:", sessionId);
-    console.log("Token Status:", token ? "Present" : "Missing");
-
-    // 2. CRITICAL CONDITION: The session initialization must wait for all dependencies to be loaded.
     if (persona?.id && user?.id && token && !sessionId) { 
         console.log("STARTING FETCH AND INIT SESSION...");
-        // FIX: Only pass persona ID, the backend will infer user ID from the token
         fetchAndInitSession(persona.id);
     }
-    // 3. Dependency Array: All state and props used inside the effect must be here.
   }, [persona, user, token, sessionId, fetchAndInitSession]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => setFiles(acceptedFiles), []);
@@ -449,10 +442,15 @@ const PersonaChatPage = () => {
 
     let currentSessionId = sessionId;
     if (!currentSessionId && persona?.id) {
+        // This will now use the enhanced error logging version of startNewSession
         currentSessionId = await startNewSession(persona.id);
         setSessionId(currentSessionId);
     }
+    
+    // CRITICAL: If startNewSession failed, currentSessionId is null
     if (!currentSessionId) {
+        // The toast in startNewSession already explained the error from the server.
+        // We show this generic toast only as a final, final fallback.
         toast({ title: t("toast.error"), description: t("toast.no_session_found"), variant: "destructive" });
         return;
     }
