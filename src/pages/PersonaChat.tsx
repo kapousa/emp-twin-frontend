@@ -9,7 +9,14 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { useDropzone } from "react-dropzone";
 import { useToast } from "@/hooks/use-toast";
-import { getPersonaDetailsEndpoint, getPersonaAnswerEndpoint } from "@/configurations/api";
+import { 
+  getPersonaDetailsEndpoint, 
+  getPersonaAnswerEndpoint, 
+  CHAT_SESSION_START_ENDPOINT,
+  // This helper now takes ONLY personaId (backend gets userId from token)
+  getSessionsByUserAndPersona, 
+  getChatMessagesHistory 
+} from "@/configurations/api";
 import { useAuth } from "@/contexts/AuthProvider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTranslation } from "react-i18next";
@@ -20,7 +27,7 @@ interface PersonaAvatarProps {
   name: string;
 }
 
-// Mock Avatar Component for an attractive look (assuming you have a way to render a nice circle avatar)
+// Mock Avatar Component for an attractive look
 const PersonaAvatar: React.FC<PersonaAvatarProps> = ({ avatarUrl, name }) => {
   const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   return (
@@ -50,13 +57,21 @@ interface FullPersonaDetails {
 }
 
 interface Message {
-  id: number;
+  id: string;
   sender: "user" | "bot";
   content: string;
   type?: "video";
 }
 
-// --- ChatDisplay Component (Updated to include persona details display logic) ---
+// Interface for a chat session item (start_time is the frontend property name, mapping from start_timestamp)
+interface SessionItem {
+  id: string; 
+  persona_id: string;
+  title: string;
+  start_time: string;
+}
+
+// --- ChatDisplay Component ---
 const ChatDisplay = ({
   messages,
   messagesEndRef,
@@ -91,7 +106,7 @@ const ChatDisplay = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* NEW: Attractive Persona Header */}
+      {/* Attractive Persona Header */}
       {persona && (
         <div className="flex items-center p-4 border-b bg-card/50 shadow-sm sticky top-0 z-10">
           <PersonaAvatar avatarUrl={persona.avatar_url} name={persona.persona_name} />
@@ -108,7 +123,7 @@ const ChatDisplay = ({
           </div>
         </div>
       )}
-      {/* END NEW: Attractive Persona Header */}
+      {/* END Attractive Persona Header */}
 
       <div className="flex-1 p-4 overflow-y-auto space-y-4">
         {messages.length === 0 ? (
@@ -169,8 +184,61 @@ const ChatDisplay = ({
 };
 
 // --- ConversationList Component ---
-const ConversationList = ({ onNewConversation }: { onNewConversation: () => void }) => {
+const ConversationList = ({ 
+    currentSessionId, 
+    personaId, 
+    onSessionSelected, 
+    onNewConversation,
+    onSessionListUpdated
+}: { 
+    currentSessionId: string | null;
+    personaId: string | null; 
+    onSessionSelected: (sessionId: string) => void;
+    onNewConversation: () => void;
+    onSessionListUpdated: () => void;
+}) => {
   const { t } = useTranslation();
+  // We still need user here to trigger fetchSessions when it loads, even if we don't use user.id in the URL
+  const { token, user } = useAuth(); 
+  const [sessions, setSessions] = useState<SessionItem[]>([]);
+  
+  const fetchSessions = useCallback(async () => {
+    // We rely on user being truthy to know the context is loaded
+    if (!token || !personaId || !user) return; 
+
+    try {
+      // NOTE: getSessionsByUserAndPersona now only takes personaId
+      const response = await axios.get(getSessionsByUserAndPersona(personaId), { 
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      const fetchedSessions: SessionItem[] = response.data
+        // FIX: Sorting by 'start_timestamp' to match the likely backend property
+        .sort((a: any, b: any) => new Date(b.start_timestamp).getTime() - new Date(a.start_timestamp).getTime())
+        .map((session: any) => ({
+          id: session.id,
+          persona_id: session.persona_id,
+          title: session.title || `${t("personachat.conversations.chat_from")} ${new Date(session.start_timestamp).toLocaleDateString()}`, 
+          start_time: session.start_timestamp, 
+        }));
+      
+      setSessions(fetchedSessions);
+      onSessionListUpdated();
+    } catch (error) {
+      console.error("Failed to fetch sessions:", error);
+    }
+  // Include user in dependencies to re-run when user context loads after login
+  }, [user, token, t, personaId, onSessionListUpdated]); 
+
+  useEffect(() => {
+    if (personaId) {
+        fetchSessions();
+        // Refresh the list every 10 seconds to show new sessions started
+        const interval = setInterval(fetchSessions, 10000); 
+        return () => clearInterval(interval);
+    }
+  }, [fetchSessions, personaId]);
+
   return (
     <div className="flex flex-col p-4 border-r border-gray-200">
       <div className="flex justify-between items-center mb-4">
@@ -179,10 +247,21 @@ const ConversationList = ({ onNewConversation }: { onNewConversation: () => void
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-      <ul className="space-y-2">
-        {/* These should ideally be dynamic conversations */}
-        <li className="p-2 rounded-md hover:bg-gray-100 cursor-pointer">{t("personachat.conversations.example_chat")}</li>
-        <li className="p-2 rounded-md hover:bg-gray-100 cursor-pointer">{t("personachat.conversations.project_analysis")}</li>
+      <ul className="space-y-2 overflow-y-auto">
+        {sessions.length === 0 && (
+            <li className="text-sm text-muted-foreground">{t("personachat.conversations.no_chats")}</li>
+        )}
+        {sessions.map((session) => (
+          <li 
+            key={session.id} 
+            className={`p-2 rounded-md cursor-pointer transition-colors ${currentSessionId === session.id ? "bg-primary text-primary-foreground hover:bg-primary/90" : "hover:bg-gray-100"}`}
+            onClick={() => onSessionSelected(session.id)}
+          >
+            {/* Display title and time */}
+            <div className="text-sm font-medium truncate">{session.title}</div>
+            <div className={`text-xs ${currentSessionId === session.id ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{new Date(session.start_time).toLocaleTimeString()}</div>
+          </li>
+        ))}
       </ul>
     </div>
   );
@@ -199,26 +278,70 @@ const DOCUMENT_OPTIONS_KEYS = [
 // --- PersonaChatPage ---
 const PersonaChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [inputMessage, setInputMessage] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generateVideo, setGenerateVideo] = useState(false);
   const [persona, setPersona] = useState<FullPersonaDetails | null>(null);
+  const [refreshListKey, setRefreshListKey] = useState(0); 
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
-  const { id } = useParams<{ id: string }>();
+  const { id: personaId } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const { token, logout } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
+
+  // Helper to start a new chat session
+  const startNewSession = useCallback(async (pId: string): Promise<string | null> => {
+    if (!token) return null;
+    try {
+      const response = await axios.post(CHAT_SESSION_START_ENDPOINT, {
+        persona_id: pId,
+      }, {
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      });
+      return response.data.id as string;
+    } catch (error) {
+      console.error("Failed to start new session:", error);
+      toast({ title: t("toast.error"), description: t("toast.session_start_error_desc"), variant: "destructive" });
+      return null;
+    }
+  }, [token, toast, t]);
+  
+  // Helper to fetch and load messages for a session
+  const loadConversationHistory = useCallback(async (sId: string) => {
+    if (!token) return;
+    setMessages([]); // Clear current messages while loading
+    setSessionId(sId);
+    
+    try {
+      // NOTE: getChatMessagesHistory URL is fixed in api.ts to use /history
+      const response = await axios.get(getChatMessagesHistory(sId), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      // Assuming backend returns history in the correct Message format
+      const history: Message[] = response.data.map((msg: any) => ({
+        id: msg.id,
+        sender: msg.sender === 'user' ? 'user' : 'bot', 
+        content: msg.content,
+      }));
+      setMessages(history);
+    } catch (error) {
+      console.error("Failed to load conversation history:", error);
+      toast({ title: t("toast.history_load_failed"), description: t("toast.history_load_error_desc"), variant: "destructive" });
+    }
+  }, [token, toast, t]);
 
   // --- Fetch Persona Details ---
   const fetchPersonaDetails = useCallback(async () => {
-    if (!id || !token) return;
+    if (!personaId || !token) return;
 
     try {
-      const response = await fetch(getPersonaDetailsEndpoint(id), {
+      const response = await fetch(getPersonaDetailsEndpoint(personaId), {
         method: "GET",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
@@ -229,11 +352,67 @@ const PersonaChatPage = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [id, token]);
+  }, [personaId, token]);
 
   useEffect(() => {
     fetchPersonaDetails();
   }, [fetchPersonaDetails]);
+
+  // Function to check for existing history before creating a new session
+  // FIX: Removed uId parameter, as user ID is no longer passed to the API call.
+  const fetchAndInitSession = useCallback(async (pId: string) => { 
+    if (!token) return;
+
+    try {
+        // 1. Check for existing sessions using the filtered API
+        // FIX: The function call now only passes persona ID. Backend uses the token for user ID.
+        const response = await axios.get(getSessionsByUserAndPersona(pId), { 
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Backend should ensure this list is sorted by date/time descending (newest first)
+        const existingSessions: SessionItem[] = response.data; 
+
+        if (existingSessions && existingSessions.length > 0) {
+            // 2. Found history, load the most recent session
+            const latestSession = existingSessions[0];
+            await loadConversationHistory(latestSession.id); 
+        } else {
+            // 3. No sessions found, start a new one
+            const newSessionId = await startNewSession(pId);
+            if (newSessionId) {
+                setSessionId(newSessionId);
+            }
+        }
+        // Force ConversationList to refresh and show the initial session
+        setRefreshListKey(prev => prev + 1); 
+
+    } catch (error) {
+        console.error("Failed to fetch sessions for initialization:", error);
+        // Fallback: Start a new session if fetching the list failed
+        const newSessionId = await startNewSession(pId);
+        if (newSessionId) setSessionId(newSessionId);
+    }
+  // Removed getSessionsByUserAndPersona from dependencies as it is imported (should be stable)
+  }, [token, startNewSession, loadConversationHistory]); 
+
+
+  // Initialization Effect: Runs once when persona, user, and token are ready
+  useEffect(() => {
+    // 1. Temporary Debugging: Keep this to see when the component is ready
+    console.log("Persona ID:", persona?.id);
+    console.log("User ID:", user?.id); // CRITICAL: This must eventually be a string
+    console.log("Session ID:", sessionId);
+    console.log("Token Status:", token ? "Present" : "Missing");
+
+    // 2. CRITICAL CONDITION: The session initialization must wait for all dependencies to be loaded.
+    if (persona?.id && user?.id && token && !sessionId) { 
+        console.log("STARTING FETCH AND INIT SESSION...");
+        // FIX: Only pass persona ID, the backend will infer user ID from the token
+        fetchAndInitSession(persona.id);
+    }
+    // 3. Dependency Array: All state and props used inside the effect must be here.
+  }, [persona, user, token, sessionId, fetchAndInitSession]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => setFiles(acceptedFiles), []);
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
@@ -246,68 +425,88 @@ const PersonaChatPage = () => {
     setSelectedDocuments((prev) => (prev.includes(value) ? prev.filter((doc) => doc !== value) : [...prev, value]));
   };
 
-  const handleNewConversation = () => {
+  const handleNewConversation = async () => {
+    if (!persona?.id) return;
+    
+    // 1. Clear state
     setMessages([]);
     setInputMessage("");
-    setFiles([]); // Clear files on new conversation
-    setSelectedDocuments([]); // Clear documents on new conversation
-    setGenerateVideo(false); // Reset video option
+    setFiles([]); 
+    setSelectedDocuments([]); 
+    setGenerateVideo(false); 
+
+    // 2. Start a new session and update state
+    const newSessionId = await startNewSession(persona.id);
+    if (newSessionId) {
+        setSessionId(newSessionId);
+        setRefreshListKey(prev => prev + 1); // Trigger list refresh
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent, generateVideoOption: boolean) => {
     e.preventDefault();
-    if (!inputMessage.trim() && files.length === 0) return; // Allow submission with just files
+    if (!inputMessage.trim() && files.length === 0) return;
 
-    const newUserMessage: Message = { id: Date.now(), sender: "user", content: inputMessage || t("personachat.file_query") };
+    let currentSessionId = sessionId;
+    if (!currentSessionId && persona?.id) {
+        currentSessionId = await startNewSession(persona.id);
+        setSessionId(currentSessionId);
+    }
+    if (!currentSessionId) {
+        toast({ title: t("toast.error"), description: t("toast.no_session_found"), variant: "destructive" });
+        return;
+    }
+
+    const newUserMessage: Message = { id: String(Date.now()), sender: "user", content: inputMessage || t("personachat.file_query") };
     setMessages((prev) => [...prev, newUserMessage]);
     setInputMessage("");
     setIsSubmitting(true);
 
-    const thinkingMessage: Message = { id: Date.now() + 1, sender: "bot", content: "thinking" };
+    const thinkingMessage: Message = { id: String(Date.now() + 1), sender: "bot", content: "thinking" };
     setMessages((prev) => [...prev, thinkingMessage]);
 
     try {
       const formData = new FormData();
       formData.append("query", newUserMessage.content);
-      // Pass only the message content and sender for chat_history to avoid passing file data.
-      // Ensure your backend can handle the structure of `chat_history`.
+      formData.append("session_id", currentSessionId); 
+
       const cleanHistory = [...messages, newUserMessage].map(msg => ({ sender: msg.sender, content: msg.content }));
       formData.append("chat_history", JSON.stringify(cleanHistory));
+      
       formData.append("documents", JSON.stringify(selectedDocuments));
       files.forEach((file) => formData.append("user_docs", file));
       formData.append("generate_video", generateVideoOption ? "true" : "false");
       formData.append("save", "true");
 
-      const response = await axios.post(getPersonaAnswerEndpoint(id), formData, {
+      const response = await axios.post(getPersonaAnswerEndpoint(personaId), formData, {
         headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
       });
 
       const { answer, video_url } = response.data;
 
-      // Immediately remove the 'thinking' message
-      setMessages((prev) => prev.slice(0, -1));
+      setMessages((prev) => prev.slice(0, -1)); // Remove 'thinking'
 
       if (video_url) {
         toast({ title: t("toast.video_generating.title"), description: t("toast.video_generating.description") });
-        // NOTE: A real-world scenario would use polling or websockets to check video status.
-        // I've kept the original timeout logic but flagged it as a simple mock.
         setTimeout(() => {
-          const videoMessage: Message = { id: Date.now(), sender: "bot", content: video_url, type: "video" };
+          const videoMessage: Message = { id: String(Date.now()), sender: "bot", content: video_url, type: "video" };
           setMessages((prev) => prev.concat(videoMessage));
           toast({ title: t("toast.video_ready.title"), description: t("toast.video_ready.description") });
           setIsSubmitting(false);
-          setFiles([]); // Clear files after successful submission
+          setFiles([]);
+          setRefreshListKey(prev => prev + 1);
         }, 10000); // Mock video generation delay
       } else {
         const botAnswer = answer || t("personachat.bot_fallback_error");
-        setMessages((prev) => prev.concat({ id: Date.now(), sender: "bot", content: botAnswer }));
+        setMessages((prev) => prev.concat({ id: String(Date.now()), sender: "bot", content: botAnswer }));
         toast({ title: t("toast.question_sent.title"), description: t("toast.question_sent.description") });
         setIsSubmitting(false);
-        setFiles([]); // Clear files after successful submission
+        setFiles([]);
+        setRefreshListKey(prev => prev + 1);
       }
     } catch (error: any) {
       const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message || error.message : t("toast.unexpected_error_short");
-      setMessages((prev) => prev.slice(0, -1).concat({ id: Date.now(), sender: "bot", content: `${t("personachat.error_prefix")}: ${errorMessage}` }));
+      setMessages((prev) => prev.slice(0, -1).concat({ id: String(Date.now()), sender: "bot", content: `${t("personachat.error_prefix")}: ${errorMessage}` }));
       toast({ title: t("toast.submission_failed.title"), description: errorMessage, variant: "destructive" });
       setIsSubmitting(false);
     }
@@ -317,7 +516,6 @@ const PersonaChatPage = () => {
     <div className="w-full min-h-[calc(100vh-4rem)] bg-background">
       <div className="max-w-[90vw] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8">
-          {/* Kept the original title but the main persona details are in the chat display */}
           <h1 className="text-3xl font-bold text-foreground mb-4">
             {t("personachat.ask_persona_link")}
             {persona ? ` - ${persona.persona_name}` : ""}
@@ -328,7 +526,14 @@ const PersonaChatPage = () => {
           
           {/* Left Column: Conversation History/List */}
           <div className="w-64 flex-shrink-0 border-r border-gray-200 bg-white/50">
-             <ConversationList onNewConversation={handleNewConversation} />
+             <ConversationList 
+                key={refreshListKey} 
+                currentSessionId={sessionId} 
+                personaId={personaId} 
+                onSessionSelected={loadConversationHistory} 
+                onNewConversation={handleNewConversation}
+                onSessionListUpdated={() => {}} 
+             />
           </div>
 
           {/* Center Column: Chat Display and Input */}

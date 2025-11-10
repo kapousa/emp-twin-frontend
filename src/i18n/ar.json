@@ -300,7 +300,8 @@
     "conversations": {
       "header": "المحادثات",
       "example_chat": "محادثة مثال",
-      "project_analysis": "تحليل المشروع"
+      "project_analysis": "تحليل المشروع",
+      "no_chats": " لا يوجد محادثات محفوظة"
     },
     "options_header": "الخيارات والأدوات",
     "docs_upload": {

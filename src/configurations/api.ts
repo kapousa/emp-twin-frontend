@@ -30,12 +30,14 @@ export const getPersonaAnswerEndpoint = (personaId: string): string => `${PERSON
 // Chat Session APIs
 export const CHAT_SESSION_ENDPOINT: string = `${API_BASE_URL}/chatsession`;
 export const CHAT_SESSION_START_ENDPOINT: string = `${CHAT_SESSION_ENDPOINT}/start`;
-export const getAllUserSessions = (userId: string): string => `${CHAT_SESSION_ENDPOINT}/${userId}/getall`;
 export const endChatSession = (sessionId: string): string => `${CHAT_SESSION_ENDPOINT}/${sessionId}/end`;
+// FIX: Changed from '/messages' to '/history'
+export const getChatMessagesHistory = (sessionId: string): string => `${CHAT_SESSION_ENDPOINT}/${sessionId}/history`; 
 
+// This endpoint is correct for fetching user sessions filtered by persona
+export const getSessionsByUserAndPersona = (personaId: string): string => `${CHAT_SESSION_ENDPOINT}/persona/${personaId}/getall`;
 
-// Chat Messages APIs
+// Chat Messages APIs (Kept for completeness, though they seem separate from chat session history)
 export const CHAT_MESSAGES_ENDPOINT: string = `${API_BASE_URL}/chatmessages`;
-export const CHAT_SESSION_START_ENDPOINT: string = `${CHAT_MESSAGES_ENDPOINT}/start`;
-export const getAllUserSessions = (userId: string): string => `${CHAT_MESSAGES_ENDPOINT}/${userId}/getall`;
-export const endChatSession = (sessionId: string): string => `${CHAT_MESSAGES_ENDPOINT}/${sessionId}/end`;
+export const sendNewMessageEndpoint: string = `${CHAT_MESSAGES_ENDPOINT}/send`; 
+export const getMessageHistoryEndpoint = (sessionId: string): string => `${CHAT_MESSAGES_ENDPOINT}/${sessionId}/history`;
