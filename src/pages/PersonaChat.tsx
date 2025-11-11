@@ -534,7 +534,7 @@ const PersonaChatPage = () => {
              />
           </div>
 
-          {/* Center Column: Chat Display and Input */}
+          {/* Center. Column: Chat Display and Input */}
           <div className="flex-1 flex flex-col bg-background">
             <ChatDisplay messages={messages} messagesEndRef={messagesEndRef} toast={toast} persona={persona} />
 
