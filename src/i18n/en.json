@@ -305,6 +305,11 @@
       "project_analysis": "Project Analysis",
       "no_chats": "No saved chat"
     },
+    "view_history": "Old Conversions",
+    "start_new": "New Conversion",
+    "list_for": "Conversions with",
+    "last_updated": "Last updated",
+    "back_to_chat": "Back to chat",
     "options_header": "Options & Tools",
     "docs_upload": {
       "label": "Supporting Documents",

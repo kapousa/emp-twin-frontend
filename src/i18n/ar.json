@@ -303,6 +303,10 @@
       "project_analysis": "تحليل المشروع",
       "no_chats": " لا يوجد محادثات محفوظة"
     },
+    "start_new": "محادثة جديدة",
+    "list_for": " المحادثات مع",
+    "last_updated": "اخر تحديث",
+    "back_to_chat": "الرجوع للمحادثة",
     "options_header": "الخيارات والأدوات",
     "docs_upload": {
       "label": "المستندات الداعمة",

@@ -14,14 +14,15 @@ import { AuthProvider, useAuth } from "./contexts/AuthProvider";
 import Login from "./pages/Login";
 import PersonaEditPage from "./pages/PersonaEdit";
 import PersonaChatPage from "./pages/PersonaChat";
-// --- NEW IMPORT ---
+// --- NEW IMPORTS ---\
 import DigitalCopyPage from "./pages/DigitalCopy";
 import PersonaListPage from "./pages/PersonaList";
+import SessionsListPage from "./pages/SessionsList"; // <-- RENAMED IMPORT
 
 const queryClient = new QueryClient();
 
 // A wrapper component to protect routes (no change here)
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
   if (loading) {
     return (
@@ -33,17 +34,20 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
-  return isAuthenticated ? children : <Navigate to="/admin/login" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" replace />;
+  }
+  return children;
 };
 
-const App = () => (
+const App: React.FC = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
       <AuthProvider>
         <BrowserRouter>
-          <div className="min-h-screen bg-background">
+          <Toaster />
+          <Sonner />
+          <div className="flex flex-col min-h-screen">
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
@@ -68,6 +72,9 @@ const App = () => (
               <Route path="persona/:id/chat"
                 element={<ProtectedRoute><PersonaChatPage /></ProtectedRoute>}
               />
+              <Route path="/sessions-list" // <-- NEW DEDICATED ROUTE
+                element={<ProtectedRoute><SessionsListPage /></ProtectedRoute>} // <-- NEW COMPONENT NAME
+                />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
