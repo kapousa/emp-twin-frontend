@@ -9,11 +9,11 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { useDropzone } from "react-dropzone";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  getPersonaDetailsEndpoint, 
-  getPersonaAnswerEndpoint, 
+import {
+  getPersonaDetailsEndpoint,
+  getPersonaAnswerEndpoint,
   CHAT_SESSION_START_ENDPOINT,
-  getChatMessagesHistory 
+  getChatMessagesHistory
 } from "@/configurations/api";
 import { useAuth } from "@/contexts/AuthProvider";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -49,7 +49,7 @@ interface Message {
 
 // Helper function to parse URL query parameters
 const getQueryParam = (location: any, param: string): string | null => {
-    return new URLSearchParams(location.search).get(param);
+  return new URLSearchParams(location.search).get(param);
 };
 
 
@@ -194,14 +194,14 @@ const PersonaChatPage = () => {
   const location = useLocation(); // <-- ADDED
   const [messages, setMessages] = useState<Message[]>([]);
   // Use session ID from URL query if present, otherwise null for a new session
-  const [sessionId, setSessionId] = useState<string | null>(getQueryParam(location, 'sessionId')); 
+  const [sessionId, setSessionId] = useState<string | null>(getQueryParam(location, 'sessionId'));
   const [inputMessage, setInputMessage] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generateVideo, setGenerateVideo] = useState(false);
   const [persona, setPersona] = useState<FullPersonaDetails | null>(null);
-  
+
   // refreshListKey is now obsolete since the list component is separate. Removing its use.
   // const [refreshListKey, setRefreshListKey] = useState(0); 
 
@@ -214,41 +214,41 @@ const PersonaChatPage = () => {
 
   // Helper to start a new chat session
   const startNewSession = useCallback(async (pId: string): Promise<string | null> => {
-    if (!token || !user?.id) {
-        toast({ title: t("toast.error"), description: "Authentication failed. Please log in.", variant: "destructive" });
-        return null; 
+    if (!token ) {
+      toast({ title: t("toast.error"), description: "Authentication failed. Please log in.", variant: "destructive" });
+      return null;
     }
     try {
       const response = await axios.post(CHAT_SESSION_START_ENDPOINT, {
         persona_id: pId,
-        user_id: user.id
+        //user_id: user.id
       }, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       return response.data.id as string;
     } catch (error) {
-      const errorMessage = axios.isAxiosError(error) 
-        ? error.response?.data?.detail || error.message 
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.detail || error.message
         : "An unexpected network error occurred.";
       console.error("Failed to start new session:", errorMessage);
       toast({ title: t("toast.error"), description: `Failed to start session. Server detail: ${errorMessage}`, variant: "destructive" });
       return null;
     }
   }, [token, toast, t, user?.id]);
-  
+
   // Helper to fetch and load messages for a session
   const loadConversationHistory = useCallback(async (sId: string) => {
     if (!token) return;
     setMessages([]); // Clear current messages while loading
-    
+
     try {
       const response = await axios.get(getChatMessagesHistory(sId), {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       const history: Message[] = response.data.map((msg: any) => ({
         id: msg.id,
-        sender: msg.sender === 'user' ? 'user' : 'bot', 
+        sender: msg.sender === 'user' ? 'user' : 'bot',
         content: msg.content,
         // Assuming video type is determined by content or another flag
         type: msg.type || (msg.content?.startsWith('http') && (msg.content.includes('.mp4') || msg.content.includes('/video'))) ? 'video' : undefined,
@@ -282,25 +282,25 @@ const PersonaChatPage = () => {
   useEffect(() => {
     fetchPersonaDetails();
   }, [fetchPersonaDetails]);
-  
+
   // --- EFFECT to handle URL changes and load history ---
   useEffect(() => {
     // 1. Check URL for new sessionId
     const urlSessionId = getQueryParam(location, 'sessionId');
-    
+
     // 2. If URL sessionId changed or is different from current state, update state
     if (urlSessionId !== sessionId) {
-        setSessionId(urlSessionId);
+      setSessionId(urlSessionId);
     }
 
     // 3. If a sessionId is set (either from initial state or URL change), load history
-    if (urlSessionId) { 
-        loadConversationHistory(urlSessionId);
+    if (urlSessionId) {
+      loadConversationHistory(urlSessionId);
     } else {
-        // If there's no session ID in the URL, ensure the chat is clear for a NEW session
-        setMessages([]); 
+      // If there's no session ID in the URL, ensure the chat is clear for a NEW session
+      setMessages([]);
     }
-  }, [location.search, loadConversationHistory, sessionId]); 
+  }, [location.search, loadConversationHistory, sessionId]);
   // Dependency on `sessionId` is intentional here to prevent infinite loop 
   // if the URL updates but the state hasn't caught up, though `location.search` is the primary trigger.
 
@@ -324,10 +324,10 @@ const PersonaChatPage = () => {
     // CRITICAL: Force local state reset for immediate UX
     setMessages([]);
     setInputMessage("");
-    setFiles([]); 
-    setSelectedDocuments([]); 
-    setGenerateVideo(false); 
-    setSessionId(null); 
+    setFiles([]);
+    setSelectedDocuments([]);
+    setGenerateVideo(false);
+    setSessionId(null);
     // The useEffect above will catch the URL change and confirm the reset.
   };
 
@@ -336,28 +336,28 @@ const PersonaChatPage = () => {
     if (!inputMessage.trim() && files.length === 0) return;
 
     // --- Synchronous session check and creation ---
-    let finalSessionId = sessionId; 
+    let finalSessionId = sessionId;
 
     // 1. If no session ID exists, we must create one before sending the message
     if (!finalSessionId && personaId) {
-        setIsSubmitting(true);
-        const newSessionId = await startNewSession(personaId);
-        if (newSessionId) {
-            finalSessionId = newSessionId;
-            setSessionId(newSessionId); // Update state for future submissions
-            // CRITICAL: Update the URL *after* session creation so subsequent loads are correct
-            navigate(`/persona/${personaId}/chat?sessionId=${newSessionId}`, { replace: true });
-        } else {
-            // Failed to start session, abort submission
-            setIsSubmitting(false);
-            toast({ title: t("toast.error"), description: t("personachat.session_start_failed") || "Could not start new chat session.", variant: "destructive" });
-            return;
-        }
-    }
-    
-    if (!finalSessionId) {
+      setIsSubmitting(true);
+      const newSessionId = await startNewSession(personaId);
+      if (newSessionId) {
+        finalSessionId = newSessionId;
+        setSessionId(newSessionId); // Update state for future submissions
+        // CRITICAL: Update the URL *after* session creation so subsequent loads are correct
+        navigate(`/persona/${personaId}/chat?sessionId=${newSessionId}`, { replace: true });
+      } else {
+        // Failed to start session, abort submission
         setIsSubmitting(false);
+        toast({ title: t("toast.error"), description: t("personachat.session_start_failed") || "Could not start new chat session.", variant: "destructive" });
         return;
+      }
+    }
+
+    if (!finalSessionId) {
+      setIsSubmitting(false);
+      return;
     }
     // --- END session check and creation ---
 
@@ -373,14 +373,14 @@ const PersonaChatPage = () => {
     try {
       const formData = new FormData();
       formData.append("query", newUserMessage.content);
-      
+
       // Use the guaranteed finalSessionId
       formData.append("session_id", finalSessionId);
-      
+
       // Use current messages + new user message for history
       const currentChatHistory = [...messages, newUserMessage].map(msg => ({ sender: msg.sender, content: msg.content }));
       formData.append("chat_history", JSON.stringify(currentChatHistory));
-      
+
       formData.append("documents", JSON.stringify(selectedDocuments));
       files.forEach((file) => formData.append("user_docs", file));
       formData.append("generate_video", generateVideoOption ? "true" : "false");
@@ -417,7 +417,7 @@ const PersonaChatPage = () => {
       setIsSubmitting(false);
     }
   };
-  
+
   // Logic for the History button click
   const handleViewHistory = () => {
     if (!personaId || !persona?.persona_name) return;
@@ -437,7 +437,7 @@ const PersonaChatPage = () => {
 
         {/* FIX: Simplified to two-column (Chat + Options) */}
         <div className="flex w-full border rounded-xl shadow-2xl bg-card overflow-hidden h-[calc(100vh-16rem)]">
-          
+
           {/* Center Column: Chat Display and Input (Now the primary focus) */}
           <div className="flex-1 flex flex-col bg-background min-w-[60%]">
             <ChatDisplay messages={messages} messagesEndRef={messagesEndRef} toast={toast} persona={persona} />
@@ -460,18 +460,18 @@ const PersonaChatPage = () => {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                    {/* BUTTON: To list old conversions (Now links to the SessionListPage) */}
-                    <Button variant="outline" onClick={handleViewHistory} className="text-sm">
-                        <History className="h-4 w-4 mr-2" />
-                        {t("personachat.view_history") || "View All Sessions"}
-                    </Button>
-                    {/* BUTTON: To start a completely new empty chat in this window */}
-                    <Button variant="outline" onClick={handleNewConversation} className="text-sm">
-                        <Plus className="h-4 w-4 mr-2" />
-                        {t("personachat.start_new") || "New Chat"}
-                    </Button>
+                  {/* BUTTON: To list old conversions (Now links to the SessionListPage) */}
+                  <Button variant="outline" onClick={handleViewHistory} className="text-sm">
+                    <History className="h-4 w-4 mr-2" />
+                    {t("personachat.view_history") || "View All Sessions"}
+                  </Button>
+                  {/* BUTTON: To start a completely new empty chat in this window */}
+                  <Button variant="outline" onClick={handleNewConversation} className="text-sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t("personachat.start_new") || "New Chat"}
+                  </Button>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox id="generate-video" checked={generateVideo} onCheckedChange={setGenerateVideo} disabled={isSubmitting} />
@@ -514,7 +514,7 @@ const PersonaChatPage = () => {
                       ))}
                     </ul>
                     <Button variant="ghost" size="sm" onClick={() => setFiles([])} className="mt-2 text-xs text-destructive hover:bg-destructive/10 p-1 h-auto">
-                        {t("personachat.clear_files")}
+                      {t("personachat.clear_files")}
                     </Button>
                   </AlertDescription>
                 </Alert>
