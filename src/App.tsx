@@ -18,6 +18,7 @@ import PersonaChatPage from "./pages/PersonaChat";
 import DigitalCopyPage from "./pages/DigitalCopy";
 import PersonaListPage from "./pages/PersonaList";
 import SessionsListPage from "./pages/SessionsList"; // <-- RENAMED IMPORT
+import KnowledgeListPage from "./pages/KnowledgeList";
 
 const queryClient = new QueryClient();
 
@@ -72,8 +73,12 @@ const App: React.FC = () => (
               <Route path="persona/:id/chat"
                 element={<ProtectedRoute><PersonaChatPage /></ProtectedRoute>}
               />
-              <Route path="/sessions-list" // <-- NEW DEDICATED ROUTE
-                element={<ProtectedRoute><SessionsListPage /></ProtectedRoute>} // <-- NEW COMPONENT NAME
+              <Route 
+                path="/persona/:personaId/knowledge"
+                element={<ProtectedRoute><KnowledgeListPage /></ProtectedRoute>}
+              />
+              <Route path="/sessions-list"
+                element={<ProtectedRoute><SessionsListPage /></ProtectedRoute>}
                 />
               <Route path="*" element={<NotFound />} />
             </Routes>

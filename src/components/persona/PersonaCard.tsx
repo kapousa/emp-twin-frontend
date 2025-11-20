@@ -112,7 +112,7 @@ const PersonaCard = ({ persona, onDelete, isDeleting }: PersonaCardProps) => {
           </Link>
 
           {/* 3. Add More Knowledge */}
-          <Link to={`/admin/personas/${persona.id}/add-knowledge`}>
+          <Link to={`/persona/${persona.id}/knowledge`}>
             <Button variant="secondary" size="sm" className="w-full" disabled={isDeleting}>
               <FilePlus className="h-4 w-4 mr-2" /> {t("persona_card.knowledge_button")}
             </Button>

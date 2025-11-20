@@ -5,6 +5,9 @@ export const API_BASE_URL: string = import.meta.env.VITE_APP_API_BASE_URL || "ht
 console.log("API_BASE_URL resolved to:", API_BASE_URL);
 export const ACCESS_TOKEN_EXPIRE_MINUTES: number = 52560000;
 
+ // Helper to construct the full URL
+export const getFullApiUrl = (endpoint: string): string => `${API_BASE_URL}${endpoint}`; // <-- Must be exported
+
 // User APIs
 export const USER_ENDPOINT: string = `${API_BASE_URL}/users`;
 export const USER_LOGIN_ENDPOINT: string = `${USER_ENDPOINT}/login`;
@@ -26,6 +29,13 @@ export const getPersonaUpdateEndpoint = (personaId: string): string => `${PERSON
 export const getPersonaDeleteEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/delete`;
 export const getPersonaChatEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/chat`;
 export const getPersonaAnswerEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/ask`;
+
+// Persona knowlege files APIs
+export const getKnowledgeResourcesEndpoint = (personaId: string): string =>  `${PERSONA_ENDPOINT}/${personaId}/knowledge`;
+export const getUploadKnowledgeEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/knowledge/upload`;
+export const getReprocessKnowledgeEndpoint = (personaId: string, resourceId: string): string => `${PERSONA_ENDPOINT}/${personaId}/knowledge/${resourceId}/reprocess`;
+export const getCrawlWebsiteEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/knowledge/crawl-website`;
+export const getDeleteKnowledgeEndpoint = (personaId: string, resourceId: string): string => `${PERSONA_ENDPOINT}/${personaId}/knowledge/${resourceId}`;
 
 // Chat Session APIs
 export const CHAT_SESSION_ENDPOINT: string = `${API_BASE_URL}/chatsession`;
