@@ -1,6 +1,10 @@
 // src/components/AddResourceModal.tsx
 
 import React, { useState } from 'react';
+import axios from 'axios'; // ⭐️ Import axios
+import { useAuth } from '@/contexts/AuthProvider'; // ⭐️ Import Auth Context
+// ⭐️ Import the necessary API helpers
+import { getUploadKnowledgeEndpoint, getCrawlWebsiteEndpoint, getFullApiUrl } from '@/configurations/api'; 
 
 interface AddResourceModalProps {
   personaId: string;
@@ -10,6 +14,7 @@ interface AddResourceModalProps {
 }
 
 const AddResourceModal: React.FC<AddResourceModalProps> = ({ personaId, isOpen, onClose, onSuccess }) => {
+  const { token } = useAuth(); // ⭐️ Get the authentication token
   const [selectedTab, setSelectedTab] = useState<'upload' | 'integration' | 'website'>('upload');
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -18,29 +23,32 @@ const AddResourceModal: React.FC<AddResourceModalProps> = ({ personaId, isOpen, 
   if (!isOpen) return null;
 
   const handleFileUpload = async () => {
-    if (!fileToUpload) return;
+    if (!fileToUpload || !token) return;
     setIsLoading(true);
+    
+    // ⭐️ FIX 1: Construct the full, absolute URL using the helper
+    const endpoint = getUploadKnowledgeEndpoint(personaId);
+    //const fullUrl = getFullApiUrl(endpoint); 
+    
     const formData = new FormData();
     formData.append('files', fileToUpload);
 
     try {
-      // POST /persona/{personaId}/knowledge/upload
-      const response = await fetch(`/persona/${personaId}/knowledge/upload`, {
-        method: 'POST',
-        body: formData,
-        // Authentication headers omitted for brevity
+      // ⭐️ FIX 2: Use axios instead of native fetch, and include Auth header
+      await axios.post(endpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', 
+          Authorization: `Bearer ${token}`, // 🔑 CRITICAL: Add the token
+        },
       });
 
-      if (response.ok) {
-        onSuccess();
-        onClose();
-        alert('File upload initiated. Status will update shortly.');
-      } else {
-        throw new Error('Upload failed');
-      }
+      onSuccess();
+      onClose();
+      alert('File upload initiated. Status will update shortly.');
+      
     } catch (error) {
       console.error('Upload Error:', error);
-      alert('Failed to upload resource.');
+      alert('Failed to upload resource. Check console for details.');
     } finally {
       setIsLoading(false);
       setFileToUpload(null);
@@ -48,36 +56,40 @@ const AddResourceModal: React.FC<AddResourceModalProps> = ({ personaId, isOpen, 
   };
   
   const handleWebsiteCrawl = async () => {
-    if (!websiteUrl) return;
+    if (!websiteUrl || !token) return;
     setIsLoading(true);
+    
+    // ⭐️ FIX 1: Construct the full, absolute URL using the helper
+    const endpoint = getCrawlWebsiteEndpoint(personaId);
+    const fullUrl = getFullApiUrl(endpoint);
+    
     try {
-        // POST /persona/{personaId}/knowledge/crawl-website
-        const response = await fetch(`/persona/${personaId}/knowledge/crawl-website`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ start_url: websiteUrl, name: `Crawl: ${websiteUrl}` }),
-        });
+        // ⭐️ FIX 2: Use axios instead of native fetch, and include Auth header
+        await axios.post(fullUrl, 
+            { start_url: websiteUrl, name: `Crawl: ${websiteUrl}` }, // Request Body
+            {
+                headers: { 
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`, // 🔑 CRITICAL: Add the token
+                },
+            }
+        );
 
-        if (response.ok) {
-            onSuccess();
-            onClose();
-            alert('Website crawl initiated. Check the list for status updates.');
-        } else {
-            throw new Error('Crawl initiation failed');
-        }
+        onSuccess();
+        onClose();
+        alert('Website crawl initiated. Check the list for status updates.');
+        
     } catch (error) {
         console.error('Crawl Error:', error);
-        alert('Failed to initiate website crawl.');
+        alert('Failed to initiate website crawl. Check console for details.');
     } finally {
         setIsLoading(false);
     }
   };
 
   const handleIntegration = (service: string) => {
-    // This is a placeholder. A real implementation would call the backend to get an OAuth URL
-    // and then perform a window.location.replace(authUrl) to start the flow.
+    // This part is unchanged as it's a placeholder
     alert(`Initiating OAuth flow for ${service}. Please check the console for the next step (API call to backend needed).`);
-    // Example call to POST /persona/{personaId}/knowledge/integrate/gmail
     onClose();
   }
 
@@ -118,7 +130,7 @@ const AddResourceModal: React.FC<AddResourceModalProps> = ({ personaId, isOpen, 
                 <input type="file" onChange={(e) => setFileToUpload(e.target.files ? e.target.files[0] : null)} className="block w-full text-sm text-gray-500"/>
                 <button 
                     onClick={handleFileUpload} 
-                    disabled={!fileToUpload || isLoading}
+                    disabled={!fileToUpload || isLoading || !token}
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400"
                 >
                     {isLoading ? 'Uploading...' : 'Start Ingestion'}
@@ -138,7 +150,7 @@ const AddResourceModal: React.FC<AddResourceModalProps> = ({ personaId, isOpen, 
                     />
                     <button 
                         onClick={handleWebsiteCrawl} 
-                        disabled={!websiteUrl || isLoading}
+                        disabled={!websiteUrl || isLoading || !token}
                         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400"
                     >
                         {isLoading ? 'Crawling...' : 'Crawl Website'}
