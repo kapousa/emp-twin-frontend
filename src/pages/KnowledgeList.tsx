@@ -166,7 +166,6 @@ const KnowledgeListPage: React.FC = () => {
     <div className="p-8 bg-gray-100 min-h-screen">
       <header className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">{selectedPersonaName}'s Knowledge Base 🧠</h1>
-        <p className="text-sm text-gray-500 mt-1">Home &gt; Your Digital Copies &gt; {selectedPersonaName} &gt; Knowledge Base</p>
       </header>
       
       <div className="flex justify-end mb-6">

@@ -61,11 +61,11 @@ const AddResourceModal: React.FC<AddResourceModalProps> = ({ personaId, isOpen, 
     
     // ⭐️ FIX 1: Construct the full, absolute URL using the helper
     const endpoint = getCrawlWebsiteEndpoint(personaId);
-    const fullUrl = getFullApiUrl(endpoint);
+    // const fullUrl = getFullApiUrl(endpoint);
     
     try {
         // ⭐️ FIX 2: Use axios instead of native fetch, and include Auth header
-        await axios.post(fullUrl, 
+        await axios.post(endpoint, 
             { start_url: websiteUrl, name: `Crawl: ${websiteUrl}` }, // Request Body
             {
                 headers: { 

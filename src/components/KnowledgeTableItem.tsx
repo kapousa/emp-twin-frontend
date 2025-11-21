@@ -65,7 +65,6 @@ const KnowledgeTableItem: React.FC<KnowledgeTableItemProps> = ({
       <td className="p-4"><StatusBadge status={resource.status} /></td>
       {/* Ensure last_updated_at is not null before creating Date object */}
       <td className="p-4">{resource.last_updated_at ? new Date(resource.last_updated_at).toLocaleDateString() : 'N/A'}</td>
-      <td className="p-4">{resource.chunk_count}</td>
       <td className="p-4 space-x-2 flex items-center">
         <button onClick={() => onViewDetails(resource)} className="text-blue-500 hover:text-blue-700">View</button>
 
