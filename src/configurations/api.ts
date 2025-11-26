@@ -51,3 +51,18 @@ export const getSessionsByUserAndPersona = (personaId: string): string => `${CHA
 export const CHAT_MESSAGES_ENDPOINT: string = `${API_BASE_URL}/chatmessages`;
 export const sendNewMessageEndpoint: string = `${CHAT_MESSAGES_ENDPOINT}/send`; 
 export const getMessageHistoryEndpoint = (sessionId: string): string => `${CHAT_MESSAGES_ENDPOINT}/${sessionId}/history`;
+
+// --- Google Drive Integration Endpoints ---
+/**
+ * Endpoint to initiate the Google Drive OAuth flow and get the authorization URL.
+ * @param personaId The ID of the persona to associate the integration with.
+ */
+export const getInitiateGoogleDriveEndpoint = (personaId: string): string =>
+  `${PERSONA_ENDPOINT}/${personaId}/knowledge/google-drive/initiate`;
+/**
+ * The callback endpoint that Google will redirect to after user authorization.
+ * The frontend must set its own public URL for this route as the redirect_uri in the Google Console.
+ * @param personaId The ID of the persona.
+ */
+export const getGoogleDriveCallbackEndpoint = (personaId: string): string =>
+  `${PERSONA_ENDPOINT}/${personaId}/knowledge/google-drive/callback`;
