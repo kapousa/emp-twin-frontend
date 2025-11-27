@@ -339,5 +339,10 @@
   "Generate Resume": "Generate Resume",
   "Generate Intro Video": "Generate Intro Video",
   "Reply to my today's Emails": "Reply to my today's Emails",
-  "Send message to freind": "Send message to freind"
+  "Send message to freind": "Send message to freind",
+
+  "sessionslist": {
+    "header": "History"
+  }
+
 }

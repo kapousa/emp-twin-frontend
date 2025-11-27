@@ -12,11 +12,12 @@ import {
 } from "@/configurations/api";
 import { useAuth } from "@/contexts/AuthProvider";
 
-// Import the new ChatBox component
-import ChatBox from "@/components/persona/PersonaChatBox"; 
+// Import the new ChatBox component and the new SessionHistoryPanel
+import ChatBox from "@/components/persona/ChatBox"; 
+import SessionHistoryPanel from "@/components/chat/SessionHistoryPanel";
 
 
-// --- Interface Definitions (Kept here for data/logic) ---
+// --- Interface Definitions ---
 interface FullPersonaDetails {
     id: string;
     persona_name: string;
@@ -134,14 +135,13 @@ const PersonaChatPage = () => {
         }
     }, [personaId, token]);
 
-    // Logic for the History button click
-    const handleViewHistory = useCallback(() => {
-        if (!personaId || !persona?.persona_name) return;
-        navigate(`/sessions-list`, { state: { personaId: personaId, personaName: persona.persona_name } });
-    }, [personaId, persona?.persona_name, navigate]);
-
+    // Handler for starting a new chat session (clears state, updates URL)
     const handleNewConversation = useCallback(() => {
+        if (!personaId) return;
+        // Navigate to the chat route without the sessionId query param
         navigate(`/persona/${personaId}/chat`, { replace: true });
+
+        // CRITICAL: Force local state reset for immediate UX
         setMessages([]);
         setInputMessage("");
         setFiles([]);
@@ -149,6 +149,23 @@ const PersonaChatPage = () => {
         setGenerateVideo(false);
         setSessionId(null);
     }, [personaId, navigate]);
+
+    // Handler for selecting an existing session from the list
+    const handleSessionSelect = useCallback((sId: string) => {
+        if (sId === sessionId || !personaId) return; // Ignore if already selected
+        
+        // Update URL to load the selected session
+        navigate(`/persona/${personaId}/chat?sessionId=${sId}`, { replace: true });
+        
+        // The useEffect below will handle setting the sessionId state and loading history
+    }, [sessionId, personaId, navigate]);
+    
+    // Handler for navigating to the dedicated history list page
+    const handleViewHistory = useCallback(() => {
+        if (!personaId || !persona?.persona_name) return;
+        navigate(`/sessions-list`, { state: { personaId: personaId, personaName: persona.persona_name } });
+    }, [personaId, persona?.persona_name, navigate]);
+
 
     const handleCheckboxChange = useCallback((value: string) => {
         setSelectedDocuments((prev) => (prev.includes(value) ? prev.filter((doc) => doc !== value) : [...prev, value]));
@@ -185,7 +202,6 @@ const PersonaChatPage = () => {
         const newUserMessage: Message = { id: String(Date.now()), sender: "user", content: inputMessage || t("personachat.file_query") };
         setMessages((prev) => [...prev, newUserMessage]);
         setInputMessage("");
-        // Set submitting AFTER adding the message, so the `useEffect` doesn't interfere
         setIsSubmitting(true); 
 
         const thinkingMessage: Message = { id: String(Date.now() + 1), sender: "bot", content: "thinking" };
@@ -244,7 +260,7 @@ const PersonaChatPage = () => {
         fetchPersonaDetails();
     }, [fetchPersonaDetails]);
     
-    // EFFECT to handle URL changes and load history (FIX APPLIED HERE)
+    // EFFECT to handle URL changes and load history (Includes the previous fix)
     useEffect(() => {
         const urlSessionId = getQueryParam(location, 'sessionId');
 
@@ -256,20 +272,17 @@ const PersonaChatPage = () => {
         // 2. Load history or clear chat based on URL
         if (urlSessionId) {
             
-            // CRITICAL FIX: If we are currently submitting, we assume the messages are correct 
-            // locally and the server is saving them. We skip history load 
-            // to prevent wiping out the un-saved Q1/thinking message.
+            // CRITICAL FIX: Skip history load if currently submitting the very first message
             if (isSubmitting) {
                 return;
             }
             
-            // For all other cases (e.g., initial load with a session ID, or navigating between sessions), load history.
             loadConversationHistory(urlSessionId);
         } else {
             // If there's no session ID in the URL, ensure the chat is clear for a NEW session
             setMessages([]);
         }
-    }, [location.search, loadConversationHistory, sessionId, isSubmitting]); // ADDED isSubmitting to dependencies
+    }, [location.search, loadConversationHistory, sessionId, isSubmitting]); 
 
     // Effect to scroll to the bottom when messages change
     useEffect(() => {
@@ -279,7 +292,7 @@ const PersonaChatPage = () => {
 
     return (
         <div className="w-full min-h-[calc(100vh-4rem)] bg-background">
-            <div className="max-w-[90vw] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="max-w-[95vw] mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-foreground mb-4">
                         {t("personachat.ask_persona_link")}
@@ -287,28 +300,48 @@ const PersonaChatPage = () => {
                     </h1>
                 </div>
 
-                {/* Render the new ChatBox component, passing all props down */}
-                <ChatBox 
-                    messages={messages}
-                    persona={persona}
-                    messagesEndRef={messagesEndRef}
-                    inputMessage={inputMessage}
-                    setInputMessage={setInputMessage}
-                    isSubmitting={isSubmitting}
-                    handleSubmit={handleSubmit}
-                    handleNewConversation={handleNewConversation}
-                    handleViewHistory={handleViewHistory}
-                    files={files}
-                    setFiles={setFiles}
-                    selectedDocuments={selectedDocuments}
-                    handleCheckboxChange={handleCheckboxChange}
-                    generateVideo={generateVideo}
-                    setGenerateVideo={setGenerateVideo}
-                    getRootProps={getRootProps}
-                    getInputProps={getInputProps}
-                    toast={toast} // Pass toast down for use in copy/download handlers
-                />
+                {/* New structure: 3-part flex container for Sessions | Chat | Options */}
+                <div className="flex w-full border rounded-xl shadow-2xl bg-card overflow-hidden h-[calc(100vh-16rem)]">
 
+                    {/* Left Column: Session History Panel */}
+                    {personaId && (
+                        <SessionHistoryPanel
+                            personaId={personaId}
+                            currentSessionId={sessionId}
+                            onNewSession={handleNewConversation}
+                            onSessionSelect={handleSessionSelect}
+                            t={t}
+                            toast={toast}
+                        />
+                    )}
+
+
+                    {/* Right two columns combined: Chat and Options (Handled by the ChatBox component) */}
+                    {/* The ChatBox component from the previous turn contained both the Chat/Input area and the Options Panel. */}
+                    <ChatBox 
+                        messages={messages}
+                        persona={persona}
+                        messagesEndRef={messagesEndRef}
+                        inputMessage={inputMessage}
+                        setInputMessage={setInputMessage}
+                        isSubmitting={isSubmitting}
+                        handleSubmit={handleSubmit}
+                        // These buttons are now redundant with the left sidebar's but must be passed 
+                        // as they are required by the component interface.
+                        handleNewConversation={handleNewConversation}
+                        handleViewHistory={handleViewHistory} 
+                        files={files}
+                        setFiles={setFiles}
+                        selectedDocuments={selectedDocuments}
+                        handleCheckboxChange={handleCheckboxChange}
+                        generateVideo={generateVideo}
+                        setGenerateVideo={setGenerateVideo}
+                        getRootProps={getRootProps}
+                        getInputProps={getInputProps}
+                        toast={toast} 
+                    />
+
+                </div>
             </div>
         </div>
     );

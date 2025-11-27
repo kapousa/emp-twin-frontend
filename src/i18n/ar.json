@@ -336,5 +336,8 @@
   "Generate Resume": "إنشاء سيرة ذاتية",
   "Generate Intro Video": "إنشاء فيديو تعريفي",
   "Reply to my today's Emails": "الرد على رسائل البريد الإلكتروني لهذا اليوم",
-  "Send message to freind": "إرسال رسالة إلى صديق"
+  "Send message to freind": "إرسال رسالة إلى صديق",
+  "sessionslist": {
+    "header": "سجل المحادثات"
+  }
 }

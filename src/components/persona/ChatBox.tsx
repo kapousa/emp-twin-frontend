@@ -246,18 +246,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({
                     />
 
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            <Button variant="outline" onClick={handleViewHistory} className="text-sm">
+                       <div className="flex items-center space-x-4">
+                            {/*<Button variant="outline" onClick={handleViewHistory} className="text-sm">
                                 <History className="h-4 w-4 mr-2" />
                                 {t("personachat.view_history") || "View All Sessions"}
                             </Button>
                             <Button variant="outline" onClick={handleNewConversation} className="text-sm">
                                 <Plus className="h-4 w-4 mr-2" />
                                 {t("personachat.start_new") || "New Chat"}
-                            </Button>
+                            </Button>*/}
                         </div>
 
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-4 float-right">
                             <div className="flex items-center space-x-2">
                                 <Checkbox id="generate-video" checked={generateVideo} onCheckedChange={setGenerateVideo} disabled={isSubmitting} />
                                 <Label htmlFor="generate-video" className="text-sm font-medium">{t("personachat.generate_video_label")}</Label>
