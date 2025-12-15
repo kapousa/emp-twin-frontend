@@ -5,6 +5,7 @@ export const API_BASE_URL: string = import.meta.env.VITE_APP_API_BASE_URL || "ht
 console.log("API_BASE_URL resolved to:", API_BASE_URL);
 export const ACCESS_TOKEN_EXPIRE_MINUTES: number = 52560000;
 
+
  // Helper to construct the full URL
 export const getFullApiUrl = (endpoint: string): string => `${API_BASE_URL}${endpoint}`; // <-- Must be exported
 
@@ -66,3 +67,35 @@ export const getInitiateGoogleDriveEndpoint = (personaId: string): string =>
  */
 export const getGoogleDriveCallbackEndpoint = (personaId: string): string =>
   `${PERSONA_ENDPOINT}/${personaId}/knowledge/google-drive/callback`;
+
+// --- WebSocket Endpoint ---
+const getWebSocketBaseUrl = (baseUrl: string): string => {
+    if (baseUrl.startsWith('https://')) {
+        return `wss://${baseUrl.substring(8)}`;
+    }
+    if (baseUrl.startsWith('http://')) {
+        return `ws://${baseUrl.substring(7)}`;
+    }
+    return baseUrl; // Fallback
+};
+export const WS_BASE_URL: string = getWebSocketBaseUrl(API_BASE_URL);
+export const getChatWebSocketEndpoint = (sessionId: string): string => {
+    // The path is now: /persona/ws/chat/{session_id}
+    const wsPath = PERSONA_ENDPOINT.replace(API_BASE_URL, '') + `/ws/chat/${sessionId}`;
+    return `${WS_BASE_URL}${wsPath}`;
+};
+
+
+/**
+ * Endpoint for uploading a file to be used temporarily in a single chat session's RAG context.
+ * @param personaId The ID of the persona.
+ */
+export const uploadTemporaryRAGFileEndpoint = (personaId: string): string => 
+  `${PERSONA_ENDPOINT}/${personaId}/knowledge/upload-temp`;
+
+
+// OR, simpler, if you know the prefix:
+/*
+export const getChatWebSocketEndpoint = (sessionId: string): string => 
+    `${WS_BASE_URL}/persona/ws/chat/${sessionId}`;
+*/
