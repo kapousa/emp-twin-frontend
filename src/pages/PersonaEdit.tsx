@@ -361,7 +361,7 @@ const PersonaEditPage = () => {
                     <div className="flex justify-end space-x-4 mt-8">
                         <Button
                             variant="outline"
-                            onClick={() => navigate('/admin/personas')}
+                            onClick={() => navigate('/persona/list')}
                             disabled={isSaving}
                         >
                             <XCircle className="h-4 w-4 mr-2" /> {t("persona_edit.cancel_button")}
