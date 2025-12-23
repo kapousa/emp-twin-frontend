@@ -12,49 +12,38 @@ import {
 } from "@/configurations/api";
 import { useAuth } from "@/contexts/AuthProvider";
 
-// Import the new ChatBox component and the new SessionHistoryPanel
-import ChatBox from "@/components/persona/ChatBox"; 
+import ChatBox from "@/components/persona/ChatBox";
 import SessionHistoryPanel from "@/components/chat/SessionHistoryPanel";
 
-
 // --- Interface Definitions ---
-interface FullPersonaDetails {
-    id: string;
-    persona_name: string;
-    persona_role: string;
-    persona_tone: string;
-    knowledge_text: string;
-    avatar_url: string | null;
-    status: "queued" | "processing" | "ready" | "failed";
-    user_id: string;
-    created_at: string;
-    updated_at: string;
-    knowledge_files?: any[];
-}
-
 interface Message {
     id: string;
     sender: "user" | "bot";
     content: string;
     type?: "video";
+    suggestions?: string[]; // Always defined in bot responses
 }
 
-// Helper function to parse URL query parameters
+interface FullPersonaDetails {
+    id: string;
+    persona_name: string;
+    persona_role: string;
+    persona_tone: string;
+    avatar_url: string | null;
+}
+
 const getQueryParam = (location: any, param: string): string | null => {
     return new URLSearchParams(location.search).get(param);
 };
 
-
-// --- PersonaChatPage (Controller/Container Component) ---
 const PersonaChatPage = () => {
     const location = useLocation();
     const { id: personaId } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { toast } = useToast();
     const { t } = useTranslation();
-    const { token, user } = useAuth();
-    
-    // State Management
+    const { token } = useAuth();
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [sessionId, setSessionId] = useState<string | null>(getQueryParam(location, 'sessionId'));
     const [inputMessage, setInputMessage] = useState("");
@@ -65,283 +54,154 @@ const PersonaChatPage = () => {
     const [persona, setPersona] = useState<FullPersonaDetails | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const onDrop = useCallback((acceptedFiles: File[]) => setFiles(acceptedFiles), []);
-    const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
-    
-    // --- Handlers for Logic ---
-    
-    // Helper to start a new chat session
-    const startNewSession = useCallback(async (pId: string): Promise<string | null> => {
-        if (!token) {
-            toast({ title: t("toast.error"), description: "Authentication failed. Please log in.", variant: "destructive" });
-            return null;
-        }
+    // --- Session & History Logic ---
+    const startNewSession = useCallback(async (pId: string) => {
         try {
-            const response = await axios.post(CHAT_SESSION_START_ENDPOINT, {
-                persona_id: pId,
-            }, {
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            const res = await axios.post(CHAT_SESSION_START_ENDPOINT, { persona_id: pId }, {
+                headers: { Authorization: `Bearer ${token}` }
             });
-            return response.data.id as string;
-        } catch (error) {
-            const errorMessage = axios.isAxiosError(error)
-                ? error.response?.data?.detail || error.message
-                : "An unexpected network error occurred.";
-            console.error("Failed to start new session:", errorMessage);
-            toast({ title: t("toast.error"), description: `Failed to start session. Server detail: ${errorMessage}`, variant: "destructive" });
-            return null;
-        }
-    }, [token, toast, t]);
+            return res.data.id;
+        } catch (e) { return null; }
+    }, [token]);
 
-    // Helper to fetch and load messages for a session
-    const loadConversationHistory = useCallback(async (sId: string) => {
+    const loadHistory = useCallback(async (sId: string) => {
         if (!token) return;
-        setMessages([]); // Clear current messages while loading
-
         try {
-            const response = await axios.get(getChatMessagesHistory(sId), {
-                headers: { Authorization: `Bearer ${token}` },
+            const res = await axios.get(getChatMessagesHistory(sId), {
+                headers: { Authorization: `Bearer ${token}` }
             });
-
-            const history: Message[] = response.data.map((msg: any) => ({
+            const history = res.data.map((msg: any) => ({
                 id: msg.id,
                 sender: msg.sender === 'user' ? 'user' : 'bot',
                 content: msg.content,
-                type: msg.type || (msg.content?.startsWith('http') && (msg.content.includes('.mp4') || msg.content.includes('/video'))) ? 'video' : undefined,
+                suggestions: msg.suggestions || [],
+                type: msg.type || undefined
             }));
             setMessages(history);
-        } catch (error) {
-            console.error("Failed to load conversation history:", error);
-            toast({ title: t("toast.history_load_failed"), description: t("toast.history_load_error_desc"), variant: "destructive" });
-        }
-    }, [token, toast, t]);
+        } catch (e) { console.error(e); }
+    }, [token]);
 
-    // --- Fetch Persona Details ---
-    const fetchPersonaDetails = useCallback(async () => {
+    const fetchPersona = useCallback(async () => {
         if (!personaId || !token) return;
-
         try {
-            const response = await fetch(getPersonaDetailsEndpoint(personaId), {
-                method: "GET",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            const res = await fetch(getPersonaDetailsEndpoint(personaId), {
+                headers: { Authorization: `Bearer ${token}` }
             });
-
-            if (!response.ok) throw new Error("Failed to fetch persona");
-            const data: FullPersonaDetails = await response.json();
+            const data = await res.json();
             setPersona(data);
-        } catch (err) {
-            console.error(err);
-        }
+        } catch (e) { console.error(e); }
     }, [personaId, token]);
 
-    // Handler for starting a new chat session (clears state, updates URL)
-    const handleNewConversation = useCallback(() => {
-        if (!personaId) return;
-        // Navigate to the chat route without the sessionId query param
-        navigate(`/persona/${personaId}/chat`, { replace: true });
+    // --- Submission Logic ---
+    // 1. Update the function signature to accept 'overrideQuery'
+const handleSubmit = useCallback(async (e: React.FormEvent, generateVideoOption: boolean, overrideQuery?: string) => {
+    e.preventDefault();
 
-        // CRITICAL: Force local state reset for immediate UX
-        setMessages([]);
-        setInputMessage("");
-        setFiles([]);
-        setSelectedDocuments([]);
-        setGenerateVideo(false);
-        setSessionId(null);
-    }, [personaId, navigate]);
+    // 2. Determine the query: use the suggestion (overrideQuery) if it exists,
+    // otherwise use the typed inputMessage.
+    const currentQuery = overrideQuery || inputMessage || t("personachat.file_query");
 
-    // Handler for selecting an existing session from the list
-    const handleSessionSelect = useCallback((sId: string) => {
-        if (sId === sessionId || !personaId) return; // Ignore if already selected
-        
-        // Update URL to load the selected session
-        navigate(`/persona/${personaId}/chat?sessionId=${sId}`, { replace: true });
-        
-        // The useEffect below will handle setting the sessionId state and loading history
-    }, [sessionId, personaId, navigate]);
-    
-    // Handler for navigating to the dedicated history list page
-    const handleViewHistory = useCallback(() => {
-        if (!personaId || !persona?.persona_name) return;
-        navigate(`/sessions-list`, { state: { personaId: personaId, personaName: persona.persona_name } });
-    }, [personaId, persona?.persona_name, navigate]);
+    // 3. Update the guard to check currentQuery instead of just inputMessage
+    if (!currentQuery.trim() && files.length === 0) return;
 
+    // Capture history before resets
+    const historyToSend = messages.map(msg => ({
+        sender: msg.sender,
+        content: msg.content
+    }));
 
-    const handleCheckboxChange = useCallback((value: string) => {
-        setSelectedDocuments((prev) => (prev.includes(value) ? prev.filter((doc) => doc !== value) : [...prev, value]));
-    }, []);
+    let finalSessionId = sessionId;
+    setIsSubmitting(true);
 
-
-    const handleSubmit = useCallback(async (e: React.FormEvent, generateVideoOption: boolean) => {
-        e.preventDefault();
-        if (!inputMessage.trim() && files.length === 0) return;
-
-        let finalSessionId = sessionId;
-
-        // 1. If no session ID exists, create one before sending the message
-        if (!finalSessionId && personaId) {
-            setIsSubmitting(true);
-            const newSessionId = await startNewSession(personaId);
-            if (newSessionId) {
-                finalSessionId = newSessionId;
-                setSessionId(newSessionId);
-                // CRITICAL: Update the URL *after* session creation so subsequent loads are correct
-                navigate(`/persona/${personaId}/chat?sessionId=${newSessionId}`, { replace: true });
-            } else {
-                setIsSubmitting(false);
-                toast({ title: t("toast.error"), description: t("personachat.session_start_failed") || "Could not start new chat session.", variant: "destructive" });
-                return;
-            }
-        }
-
-        if (!finalSessionId) {
+    // Handle Session Creation
+    if (!finalSessionId && personaId) {
+        const newSessionId = await startNewSession(personaId);
+        if (newSessionId) {
+            finalSessionId = newSessionId;
+            setSessionId(newSessionId);
+            navigate(`/persona/${personaId}/chat?sessionId=${newSessionId}`, { replace: true });
+        } else {
             setIsSubmitting(false);
             return;
         }
+    }
 
-        const newUserMessage: Message = { id: String(Date.now()), sender: "user", content: inputMessage || t("personachat.file_query") };
-        setMessages((prev) => [...prev, newUserMessage]);
-        setInputMessage("");
-        setIsSubmitting(true); 
+    // 4. Update Local UI with the correct query
+    const newUserMessage: Message = { id: String(Date.now()), sender: "user", content: currentQuery };
+    setMessages((prev) => [...prev, newUserMessage, { id: "thinking", sender: "bot", content: "thinking" }]);
 
-        const thinkingMessage: Message = { id: String(Date.now() + 1), sender: "bot", content: "thinking" };
-        setMessages((prev) => [...prev, thinkingMessage]);
+    // Only clear input if we didn't use a suggestion (keeps UI clean)
+    if (!overrideQuery) setInputMessage("");
 
-        try {
-            const formData = new FormData();
-            formData.append("query", newUserMessage.content);
-            formData.append("session_id", finalSessionId);
+    try {
+        const formData = new FormData();
+        formData.append("query", currentQuery); // Now sends the suggestion correctly!
+        formData.append("session_id", finalSessionId!);
+        formData.append("chat_history", JSON.stringify(historyToSend));
+        formData.append("documents", JSON.stringify(selectedDocuments));
+        files.forEach((file) => formData.append("user_docs", file));
+        formData.append("generate_video", generateVideoOption ? "true" : "false");
+        formData.append("save", "true");
 
-            const currentChatHistory = [...messages, newUserMessage].map(msg => ({ sender: msg.sender, content: msg.content }));
-            formData.append("chat_history", JSON.stringify(currentChatHistory));
+        const response = await axios.post(getPersonaAnswerEndpoint(personaId!), formData, {
+            headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
+        });
 
-            formData.append("documents", JSON.stringify(selectedDocuments));
-            files.forEach((file) => formData.append("user_docs", file));
-            formData.append("generate_video", generateVideoOption ? "true" : "false");
-            formData.append("save", "true");
+        const { answer, video_url, suggestions } = response.data;
 
-            const response = await axios.post(getPersonaAnswerEndpoint(personaId), formData, {
-                headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
-            });
+        setMessages((prev) => {
+            const historyWithoutThinking = prev.filter(m => m.id !== "thinking");
+            const botMsg: Message = video_url
+                ? { id: String(Date.now()), sender: "bot", content: video_url, type: "video", suggestions: suggestions || [] }
+                : { id: String(Date.now()), sender: "bot", content: answer || t("personachat.bot_fallback_error"), suggestions: suggestions || [] };
+            return [...historyWithoutThinking, botMsg];
+        });
 
-            const { answer, video_url } = response.data;
+        setFiles([]);
+    } catch (error: any) {
+        setMessages((prev) => prev.filter(m => m.id !== "thinking"));
+        toast({ title: t("toast.error"), description: "Failed to get answer", variant: "destructive" });
+    } finally {
+        setIsSubmitting(false);
+    }
+}, [sessionId, inputMessage, messages, personaId, token, t, navigate, startNewSession, files, selectedDocuments]);
 
-            setMessages((prev) => prev.slice(0, -1)); // Remove 'thinking'
-
-            if (video_url) {
-                toast({ title: t("toast.video_generating.title"), description: t("toast.video_generating.description") });
-                setTimeout(() => {
-                    const videoMessage: Message = { id: String(Date.now()), sender: "bot", content: video_url, type: "video" };
-                    setMessages((prev) => prev.concat(videoMessage));
-                    toast({ title: t("toast.video_ready.title"), description: t("toast.video_ready.description") });
-                    setIsSubmitting(false);
-                    setFiles([]);
-                }, 10000); // Mock video generation delay
-            } else {
-                const botAnswer = answer || t("personachat.bot_fallback_error");
-                setMessages((prev) => prev.concat({ id: String(Date.now()), sender: "bot", content: botAnswer }));
-                toast({ title: t("toast.question_sent.title"), description: t("toast.question_sent.description") });
-                setIsSubmitting(false);
-                setFiles([]);
-            }
-        } catch (error: any) {
-            const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message || error.message : t("toast.unexpected_error_short");
-            setMessages((prev) => prev.slice(0, -1).concat({ id: String(Date.now()), sender: "bot", content: `${t("personachat.error_prefix")}: ${errorMessage}` }));
-            toast({ title: t("toast.submission_failed.title"), description: errorMessage, variant: "destructive" });
-            setIsSubmitting(false);
-        }
-    }, [sessionId, inputMessage, files, selectedDocuments, personaId, token, toast, t, navigate, messages, startNewSession]);
-
-
-    // --- EFFECTS ---
-
-    // Effect to fetch persona details on mount/ID change
+    useEffect(() => { fetchPersona(); }, [fetchPersona]);
     useEffect(() => {
-        fetchPersonaDetails();
-    }, [fetchPersonaDetails]);
-    
-    // EFFECT to handle URL changes and load history (Includes the previous fix)
-    useEffect(() => {
-        const urlSessionId = getQueryParam(location, 'sessionId');
-
-        // 1. Update session ID state if the URL has changed
-        if (urlSessionId !== sessionId) {
-            setSessionId(urlSessionId);
+        const urlSid = getQueryParam(location, 'sessionId');
+        if (urlSid && urlSid !== sessionId) {
+            setSessionId(urlSid);
+            loadHistory(urlSid);
         }
+    }, [location.search, loadHistory]);
 
-        // 2. Load history or clear chat based on URL
-        if (urlSessionId) {
-            
-            // CRITICAL FIX: Skip history load if currently submitting the very first message
-            if (isSubmitting) {
-                return;
-            }
-            
-            loadConversationHistory(urlSessionId);
-        } else {
-            // If there's no session ID in the URL, ensure the chat is clear for a NEW session
-            setMessages([]);
-        }
-    }, [location.search, loadConversationHistory, sessionId, isSubmitting]); 
+    useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-    // Effect to scroll to the bottom when messages change
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-
+    const { getRootProps, getInputProps } = useDropzone({ onDrop: (accepted) => setFiles(accepted) });
 
     return (
-        <div className="w-full min-h-[calc(100vh-4rem)] bg-background">
-            <div className="max-w-[95vw] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-4">
-                        {t("personachat.ask_persona_link")}
-                        {persona ? ` - ${persona.persona_name}` : ""}
-                    </h1>
-                </div>
-
-                {/* New structure: 3-part flex container for Sessions | Chat | Options */}
-                <div className="flex w-full border rounded-xl shadow-2xl bg-card overflow-hidden h-[calc(100vh-16rem)]">
-
-                    {/* Left Column: Session History Panel */}
-                    {personaId && (
-                        <SessionHistoryPanel
-                            personaId={personaId}
-                            currentSessionId={sessionId}
-                            onNewSession={handleNewConversation}
-                            onSessionSelect={handleSessionSelect}
-                            t={t}
-                            toast={toast}
-                        />
-                    )}
-
-
-                    {/* Right two columns combined: Chat and Options (Handled by the ChatBox component) */}
-                    {/* The ChatBox component from the previous turn contained both the Chat/Input area and the Options Panel. */}
-                    <ChatBox 
-                        messages={messages}
-                        persona={persona}
-                        messagesEndRef={messagesEndRef}
-                        inputMessage={inputMessage}
-                        setInputMessage={setInputMessage}
-                        isSubmitting={isSubmitting}
-                        handleSubmit={handleSubmit}
-                        // These buttons are now redundant with the left sidebar's but must be passed 
-                        // as they are required by the component interface.
-                        handleNewConversation={handleNewConversation}
-                        handleViewHistory={handleViewHistory} 
-                        files={files}
-                        setFiles={setFiles}
-                        selectedDocuments={selectedDocuments}
-                        handleCheckboxChange={handleCheckboxChange}
-                        generateVideo={generateVideo}
-                        setGenerateVideo={setGenerateVideo}
-                        getRootProps={getRootProps}
-                        getInputProps={getInputProps}
-                        toast={toast} 
+        <div className="w-full min-h-screen bg-background p-4 sm:p-8">
+            <div className="flex h-[80vh] border rounded-xl shadow-xl overflow-hidden bg-card">
+                {personaId && (
+                    <SessionHistoryPanel
+                        personaId={personaId}
+                        currentSessionId={sessionId}
+                        onNewSession={() => { setMessages([]); setSessionId(null); navigate(`/persona/${personaId}/chat`); }}
+                        onSessionSelect={(id) => navigate(`/persona/${personaId}/chat?sessionId=${id}`)}
+                        t={t} toast={toast}
                     />
-
-                </div>
+                )}
+                <ChatBox
+                    messages={messages} persona={persona} messagesEndRef={messagesEndRef}
+                    inputMessage={inputMessage} setInputMessage={setInputMessage}
+                    isSubmitting={isSubmitting} handleSubmit={handleSubmit}
+                    files={files} setFiles={setFiles}
+                    selectedDocuments={selectedDocuments} handleCheckboxChange={(val) => setSelectedDocuments(prev => prev.includes(val) ? prev.filter(v => v!==val) : [...prev, val])}
+                    generateVideo={generateVideo} setGenerateVideo={setGenerateVideo}
+                    getRootProps={getRootProps} getInputProps={getInputProps} toast={toast}
+                    handleNewConversation={() => {}} handleViewHistory={() => {}}
+                />
             </div>
         </div>
     );
