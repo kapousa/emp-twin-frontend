@@ -1,10 +1,15 @@
 // src/components/AddResourceModal.tsx
 
 import React, { useState } from 'react';
-import axios from 'axios'; // ⭐️ Import axios
-import { useAuth } from '@/contexts/AuthProvider'; // ⭐️ Import Auth Context
-// ⭐️ Import the necessary API helpers
-import { getUploadKnowledgeEndpoint, getCrawlWebsiteEndpoint, getFullApiUrl } from '@/configurations/api'; 
+import axios from 'axios';
+import { useAuth } from '@/contexts/AuthProvider';
+import {
+  getUploadKnowledgeEndpoint,
+  getCrawlWebsiteEndpoint,
+  getGoogleDriveInitiateEndpoint,
+  getGmailInitiateEndpoint
+} from '@/configurations/api';
+import { toast } from 'react-hot-toast';
 
 interface AddResourceModalProps {
   personaId: string;
@@ -14,7 +19,7 @@ interface AddResourceModalProps {
 }
 
 const AddResourceModal: React.FC<AddResourceModalProps> = ({ personaId, isOpen, onClose, onSuccess }) => {
-  const { token } = useAuth(); // ⭐️ Get the authentication token
+  const { token } = useAuth();
   const [selectedTab, setSelectedTab] = useState<'upload' | 'integration' | 'website'>('upload');
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -25,151 +30,131 @@ const AddResourceModal: React.FC<AddResourceModalProps> = ({ personaId, isOpen, 
   const handleFileUpload = async () => {
     if (!fileToUpload || !token) return;
     setIsLoading(true);
-    
-    // ⭐️ FIX 1: Construct the full, absolute URL using the helper
     const endpoint = getUploadKnowledgeEndpoint(personaId);
-    //const fullUrl = getFullApiUrl(endpoint); 
-    
+
     const formData = new FormData();
     formData.append('files', fileToUpload);
 
     try {
-      // ⭐️ FIX 2: Use axios instead of native fetch, and include Auth header
       await axios.post(endpoint, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', 
-          Authorization: `Bearer ${token}`, // 🔑 CRITICAL: Add the token
-        },
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
       });
-
+      toast.success("File uploaded successfully!");
       onSuccess();
       onClose();
-      alert('File upload initiated. Status will update shortly.');
-      
     } catch (error) {
-      console.error('Upload Error:', error);
-      alert('Failed to upload resource. Check console for details.');
+      console.error(error);
+      toast.error("Failed to upload file.");
     } finally {
       setIsLoading(false);
-      setFileToUpload(null);
     }
   };
-  
-  const handleWebsiteCrawl = async () => {
-    if (!websiteUrl || !token) return;
-    setIsLoading(true);
-    
-    // ⭐️ FIX 1: Construct the full, absolute URL using the helper
-    const endpoint = getCrawlWebsiteEndpoint(personaId);
-    // const fullUrl = getFullApiUrl(endpoint);
-    
-    try {
-        // ⭐️ FIX 2: Use axios instead of native fetch, and include Auth header
-        await axios.post(endpoint, 
-            { start_url: websiteUrl, name: `Crawl: ${websiteUrl}` }, // Request Body
-            {
-                headers: { 
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`, // 🔑 CRITICAL: Add the token
-                },
-            }
-        );
 
-        onSuccess();
-        onClose();
-        alert('Website crawl initiated. Check the list for status updates.');
-        
+const handleWebsiteCrawl = async () => {
+  if (!websiteUrl || !token) return;
+  setIsLoading(true);
+  const endpoint = getCrawlWebsiteEndpoint(personaId);
+
+  try {
+    // CHANGE THIS LINE: Change 'url' to 'start_url'
+    await axios.post(endpoint, { start_url: websiteUrl }, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    toast.success("Crawl started!");
+    onSuccess();
+    onClose();
+  } catch (error) {
+    toast.error("Failed to start crawl.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+  // ⭐️ UPDATED: Logic for Google Drive and Gmail Integration
+  const handleIntegration = async (type: 'gmail' | 'google_drive' | 'notion') => {
+    if (!token) return;
+    setIsLoading(true);
+
+    try {
+        let endpoint = "";
+        if (type === 'google_drive') {
+            endpoint = getGoogleDriveInitiateEndpoint(personaId);
+        } else if (type === 'gmail') {
+            // Reusing the same service logic for Gmail
+            endpoint = getGmailInitiateEndpoint(personaId);
+        }
+
+        if (endpoint) {
+            const response = await axios.post(endpoint, {}, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const { auth_url } = response.data;
+            if (auth_url) {
+                // Redirect to Google Consent Screen
+                window.location.href = auth_url;
+            }
+        } else {
+            toast.error(`${type} integration not implemented yet.`);
+        }
     } catch (error) {
-        console.error('Crawl Error:', error);
-        alert('Failed to initiate website crawl. Check console for details.');
+        console.error("Integration Error:", error);
+        toast.error("Failed to connect to service.");
     } finally {
         setIsLoading(false);
     }
   };
 
-  const handleIntegration = (service: string) => {
-    // This part is unchanged as it's a placeholder
-    alert(`Initiating OAuth flow for ${service}. Please check the console for the next step (API call to backend needed).`);
-    onClose();
-  }
-
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-1/3 shadow-2xl">
-        <h2 className="text-xl font-bold mb-4">Add New Knowledge Resource</h2>
-        
-        <div className="flex border-b mb-4">
-          <button 
-            onClick={() => setSelectedTab('upload')} 
-            className={`py-2 px-4 ${selectedTab === 'upload' ? 'border-b-2 border-blue-500 font-semibold' : 'text-gray-500'}`}
-            disabled={isLoading}
-          >
-            File Upload
-          </button>
-          <button 
-            onClick={() => setSelectedTab('website')} 
-            className={`py-2 px-4 ${selectedTab === 'website' ? 'border-b-2 border-blue-500 font-semibold' : 'text-gray-500'}`}
-            disabled={isLoading}
-          >
-            Web Crawler
-          </button>
-          <button 
-            onClick={() => setSelectedTab('integration')} 
-            className={`py-2 px-4 ${selectedTab === 'integration' ? 'border-b-2 border-blue-500 font-semibold' : 'text-gray-500'}`}
-            disabled={isLoading}
-          >
-            Integrations
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <h2 className="text-xl font-bold mb-4">Add Knowledge Resource</h2>
 
-        {/* --- Tab Panels --- */}
-        <div className="space-y-4">
-            {selectedTab === 'upload' && (
-            <div className="border p-4 rounded bg-gray-50 space-y-3">
-                <p className="text-sm text-gray-600">Upload files (PDF, DOCX, CSV, HTML) to enrich this persona.</p>
-                <input type="file" onChange={(e) => setFileToUpload(e.target.files ? e.target.files[0] : null)} className="block w-full text-sm text-gray-500"/>
-                <button 
-                    onClick={handleFileUpload} 
-                    disabled={!fileToUpload || isLoading || !token}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400"
-                >
-                    {isLoading ? 'Uploading...' : 'Start Ingestion'}
-                </button>
+            <div className="flex border-b mb-4">
+                <button onClick={() => setSelectedTab('upload')} className={`flex-1 py-2 ${selectedTab === 'upload' ? 'border-b-2 border-blue-500 font-bold' : ''}`}>Upload</button>
+                <button onClick={() => setSelectedTab('website')} className={`flex-1 py-2 ${selectedTab === 'website' ? 'border-b-2 border-blue-500 font-bold' : ''}`}>Website</button>
+                <button onClick={() => setSelectedTab('integration')} className={`flex-1 py-2 ${selectedTab === 'integration' ? 'border-b-2 border-blue-500 font-bold' : ''}`}>Integrations</button>
             </div>
+
+            {selectedTab === 'upload' && (
+                <div className="space-y-4">
+                    <input type="file" onChange={(e) => setFileToUpload(e.target.files?.[0] || null)} className="w-full border p-2 rounded" />
+                    <button onClick={handleFileUpload} disabled={!fileToUpload || isLoading} className="w-full bg-blue-500 text-white py-2 rounded disabled:bg-gray-400">
+                        {isLoading ? 'Uploading...' : 'Upload File'}
+                    </button>
+                </div>
             )}
 
             {selectedTab === 'website' && (
-                <div className="border p-4 rounded bg-gray-50 space-y-3">
-                    <p className="text-sm text-gray-600">Start a recursive crawl of a website's content.</p>
-                    <input 
-                        type="url" 
-                        placeholder="https://example.com/docs"
-                        value={websiteUrl}
-                        onChange={(e) => setWebsiteUrl(e.target.value)}
-                        className="w-full p-2 border rounded"
-                    />
-                    <button 
-                        onClick={handleWebsiteCrawl} 
-                        disabled={!websiteUrl || isLoading || !token}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400"
-                    >
+                <div className="space-y-4">
+                    <input type="text" placeholder="https://example.com" value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} className="w-full border p-2 rounded" />
+                    <button onClick={handleWebsiteCrawl} disabled={!websiteUrl || isLoading} className="w-full bg-blue-500 text-white py-2 rounded disabled:bg-gray-400">
                         {isLoading ? 'Crawling...' : 'Crawl Website'}
                     </button>
                 </div>
             )}
 
             {selectedTab === 'integration' && (
-            <div className="border p-4 rounded bg-gray-50 space-y-3">
-                <p className="text-sm text-gray-600">Connect to external services for continuous data synchronization.</p>
-                <button onClick={() => handleIntegration('gmail')} disabled={isLoading} className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400">Connect Gmail</button>
-                <button onClick={() => handleIntegration('google_drive')} disabled={isLoading} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400">Connect Google Drive</button>
-                <button onClick={() => handleIntegration('notion')} disabled={isLoading} className="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400">Connect Notion</button>
-            </div>
+                <div className="border p-4 rounded bg-gray-50 space-y-3">
+                    <p className="text-sm text-gray-600">Sync data automatically from your cloud accounts.</p>
+                    <button onClick={() => handleIntegration('gmail')} disabled={isLoading} className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 flex items-center justify-center gap-2">
+                        {isLoading ? 'Connecting...' : 'Connect Gmail'}
+                    </button>
+                    <button onClick={() => handleIntegration('google_drive')} disabled={isLoading} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 flex items-center justify-center gap-2">
+                        {isLoading ? 'Connecting...' : 'Connect Google Drive'}
+                    </button>
+                    <button onClick={() => handleIntegration('notion')} disabled={isLoading} className="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400">
+                        Connect Notion
+                    </button>
+                </div>
             )}
-        </div>
 
-        <button onClick={onClose} className="mt-6 w-full text-gray-500 hover:text-gray-700">Close</button>
-      </div>
+            <button onClick={onClose} className="mt-6 w-full text-gray-500 hover:underline">Cancel</button>
+        </div>
     </div>
   );
 };

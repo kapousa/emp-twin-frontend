@@ -148,45 +148,46 @@ const PersonaListPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
-      {/* Header and Call to Action */}
-      <div className="flex justify-between items-center mb-10 border-b pb-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            <Brain className="h-8 w-8 inline mr-3 text-primary" />
-            {t("admin.personas.header")}
-          </h1>
-          <p className="text-muted-foreground mt-1">{t("admin.personas.description")}</p>
-        </div>
-        <Link to="/admin/digital-copy">
-          <Button size="lg" className="shadow-lg">
-            {t("admin.personas.new_button")}
-          </Button>
-        </Link>
-      </div>
-
-      {/* Persona Grid */}
-      {personas.length === 0 ? (
-        <div className="text-center p-20 border-2 border-dashed border-border rounded-xl mt-10">
-          <p className="text-xl text-muted-foreground">{t("admin.personas.empty_state_message")}</p>
-          <Link to="/admin/digital-copy">
-            <Button className="mt-6 text-lg">{t("admin.personas.empty_state_button")}</Button>
-          </Link>
-        </div>
-      ) : ( // This is the start of the "else" branch
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {personas.map((persona) => (
-            <PersonaCard
-              key={persona.id}
-              persona={persona}
-              onDelete={handleDeletePersona}
-              isDeleting={deletingId === persona.id}
-            />
-          ))}
-        </div> // This </div> correctly closes the div that wraps the persona cards
-      )} {/* This ')}' correctly closes the ternary operator */}
+ // Change max-w-7xl to a larger value or remove the constraint for full width
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  {/* Header and Call to Action */}
+  <div className="flex justify-between items-center mb-10 border-b pb-4">
+    <div>
+      <h1 className="text-3xl font-bold text-foreground">
+        <Brain className="h-8 w-8 inline mr-3 text-primary" />
+        {t("admin.personas.header")}
+      </h1>
+      <p className="text-muted-foreground mt-1">{t("admin.personas.description")}</p>
     </div>
+    <Link to="/admin/digital-copy">
+      <Button size="lg" className="shadow-lg">
+        {t("admin.personas.new_button")}
+      </Button>
+    </Link>
+  </div>
+
+{/* Persona Grid - Updated to show exactly 3 columns on large screens */}
+  {personas.length === 0 ? (
+    <div className="text-center p-20 border-2 border-dashed border-border rounded-xl mt-10">
+      <p className="text-xl text-muted-foreground">{t("admin.personas.empty_state_message")}</p>
+      <Link to="/admin/digital-copy">
+        <Button className="mt-6 text-lg">{t("admin.personas.empty_state_button")}</Button>
+      </Link>
+    </div>
+  ) : (
+    // ⭐️ Key Change: Force 3 columns on large screens and above
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      {personas.map((persona) => (
+        <PersonaCard
+          key={persona.id}
+          persona={persona}
+          onDelete={handleDeletePersona}
+          isDeleting={deletingId === persona.id}
+        />
+      ))}
+    </div>
+  )}
+</div>
   );
 };
 

@@ -30,6 +30,7 @@ export const getPersonaUpdateEndpoint = (personaId: string): string => `${PERSON
 export const getPersonaDeleteEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/delete`;
 export const getPersonaChatEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/chat`;
 export const getPersonaAnswerEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/ask`;
+export const getUpdatePersonaSettingsEndpoint = (personaId: string) => `${PERSONA_ENDPOINT}/${personaId}/settings`;
 
 // Persona knowlege files APIs
 export const getKnowledgeResourcesEndpoint = (personaId: string): string =>  `${PERSONA_ENDPOINT}/${personaId}/knowledge`;
@@ -55,11 +56,22 @@ export const getMessageHistoryEndpoint = (sessionId: string): string => `${CHAT_
 
 // --- Google Drive Integration Endpoints ---
 /**
+ * Endpoint to initiate the Gmail OAuth flow.
+ */
+export const getGmailInitiateEndpoint = (personaId: string): string =>
+  `${PERSONA_ENDPOINT}/${personaId}/knowledge/integrate/gmail/initiate`;
+/**
  * Endpoint to initiate the Google Drive OAuth flow and get the authorization URL.
  * @param personaId The ID of the persona to associate the integration with.
  */
 export const getInitiateGoogleDriveEndpoint = (personaId: string): string =>
-  `${PERSONA_ENDPOINT}/${personaId}/knowledge/google-drive/initiate`;
+  `${PERSONA_ENDPOINT}/${personaId}/knowledge/integrate/google-drive/initiate`;
+/**
+ * Endpoint to initiate the Google Drive OAuth flow.
+ * @param personaId The ID of the persona.
+ */
+export const getGoogleDriveInitiateEndpoint = (personaId: string): string =>
+  `${PERSONA_ENDPOINT}/${personaId}/knowledge/integrate/google-drive/initiate`;
 /**
  * The callback endpoint that Google will redirect to after user authorization.
  * The frontend must set its own public URL for this route as the redirect_uri in the Google Console.

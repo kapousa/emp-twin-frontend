@@ -1,20 +1,16 @@
-// src/components/PersonaCard.tsx (Updated)
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   MessageSquare,
-  BookOpen, // Not used, but kept for context
   Trash2,
-  Eye,
   Loader2,
-  FilePlus,
-  Brain
+  Settings2,
+  AlertCircle
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import { Badge } from "@/components/ui/badge";
 
 interface Persona {
   id: string;
@@ -28,115 +24,98 @@ interface PersonaCardProps {
   persona: Persona;
   onDelete: (id: string) => void;
   isDeleting: boolean;
-  // onViewDetails prop is now removed
 }
 
 const PersonaCard = ({ persona, onDelete, isDeleting }: PersonaCardProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  const numberOfStaticAvatars = 5;
-  const basePlaceholderName = "/user-placeholder-";
+  const isActionDisabled = persona.status !== 'ready';
 
-  const getDynamicAvatarIndex = (id: string, totalAvatars: number): number => {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      hash = id.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return (Math.abs(hash) % totalAvatars) + 1;
-  };
-
-  const dynamicAvatarIndex = getDynamicAvatarIndex(persona.id, numberOfStaticAvatars);
-  const dynamicStaticAvatarSrc = `${basePlaceholderName}${dynamicAvatarIndex}.png`;
-
-  const getStatusDisplay = (status: Persona['status']) => {
-    switch (status) {
-      case 'ready':
-        return <Badge variant="default" className="bg-green-500 hover:bg-green-600">{t("persona_card.status.active")}</Badge>;
-      case 'processing':
-        return <Badge variant="outline" className="text-blue-500 border-blue-500">{t("persona_card.status.processing")}</Badge>;
-      case 'queued':
-        return <Badge variant="secondary">{t("persona_card.status.queued")}</Badge>;
-      case 'failed':
-        return <Badge variant="destructive">{t("persona_card.status.failed")}</Badge>;
-      default:
-        return <Badge variant="secondary">{t("persona_card.status.unknown")}</Badge>;
-    }
-  };
-
-  const isActionDisabled = isDeleting || persona.status !== 'ready';
+  const displayName = persona.persona_name || "Unnamed Persona";
+  const displayRole = persona.persona_role || "No Role Defined";
 
   return (
-    <Card className="flex flex-col h-full hover:shadow-lg transition-shadow text-center">
-      <CardHeader className="pt-8 pb-4 flex items-center justify-center">
-        <div className="relative p-2 bg-gradient-to-br from-background to-secondary rounded-lg shadow-md">
-          <img
-            src={persona.avatar_url || dynamicStaticAvatarSrc}
-            alt={`${persona.personaName}'s avatar`}
-            className="w-28 h-28 object-cover rounded-md"
-            onError={(e) => {
-              e.currentTarget.src = "/placeholder-avatar.png";
-            }}
-          />
+    <Card className="overflow-hidden border-border bg-card hover:shadow-md transition-all relative">
+      {/* Status Badge */}
+      <div className="absolute top-2 right-2">
+        {persona.status !== 'ready' && (
+          <Badge variant={persona.status === 'failed' ? "destructive" : "secondary"} className="capitalize">
+            {persona.status}
+          </Badge>
+        )}
+      </div>
+
+      {/* ⭐️ Updated Header: Vertical layout with centered content */}
+      <CardHeader className="pb-4 pt-8 flex flex-col items-center text-center">
+        <div className="relative mb-4">
+          {persona.avatar_url ? (
+            <img
+              src={persona.avatar_url}
+              alt={displayName}
+              className="w-24 h-24 rounded-full object-cover border-4 border-muted shadow-sm"
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-primary text-3xl font-bold border-4 border-muted">
+              {displayName.charAt(0)}
+            </div>
+          )}
+
+          {/* Status Indicator Dot */}
+          {persona.status === 'ready' && (
+            <span className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-4 border-card rounded-full"></span>
+          )}
+        </div>
+
+        <div>
+          <CardTitle className="text-xl font-bold tracking-tight">{displayName}</CardTitle>
+          <CardDescription className="font-medium text-indigo-600/80">{displayRole}</CardDescription>
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0 pb-4 flex flex-col items-center">
-        <div className="space-y-1">
-          <CardTitle className="text-2xl font-bold">{persona.persona_name}</CardTitle>
-          <CardDescription className="flex items-center justify-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-            <Brain className="h-4 w-4" />
-            <span>{persona.persona_tone}</span>
-            <span>{persona.persona_role}</span>
-          </CardDescription>
-        </div>
-        <div className="mt-3">
-            {getStatusDisplay(persona.status)}
-        </div>
-      </CardContent>
-
-      <CardContent className="pt-4 border-t flex-1 flex flex-col justify-end">
-        <div className="grid grid-cols-2 gap-3">
-
-          {/* 1. See Details -> Now links to the edit page */}
-          <Link to={`/persona/${persona.id}/details`}> {/* <<< CHANGED ROUTE */}
-            <Button variant="outline" size="sm" className="w-full" disabled={isDeleting}>
-              <Eye className="h-4 w-4 mr-2" /> {t("persona_card.details_button")}
+      <CardContent className="space-y-3 px-6 pb-6">
+        <div className="grid grid-cols-2 gap-2">
+          <Link to={`/persona/${persona.id}/chat`} className="w-full">
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full font-semibold"
+              disabled={isActionDisabled}
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              {t("persona_card.chat_button", "Chat")}
             </Button>
           </Link>
 
-          {/* 2. Chat with Persona */}
-          <Link to={`/persona/${persona.id}/chat?persona=${persona.persona_name}`}>
-            <Button size="sm" className="w-full" disabled={isActionDisabled}>
-              <MessageSquare className="h-4 w-4 mr-2" /> {t("persona_card.chat_button")}
-            </Button>
-          </Link>
-
-          {/* 3. Add More Knowledge */}
-          <Link to={`/persona/${persona.id}/knowledge`}>
-            <Button variant="secondary" size="sm" className="w-full" disabled={isDeleting}>
-              <FilePlus className="h-4 w-4 mr-2" /> {t("persona_card.knowledge_button")}
-            </Button>
-          </Link>
-
-          {/* 4. Delete Persona */}
           <Button
             variant="destructive"
             size="sm"
+            className="font-semibold"
             onClick={() => onDelete(persona.id)}
             disabled={isDeleting}
           >
             {isDeleting ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Trash2 className="h-4 w-4 mr-2" />
+              <>
+                <Trash2 className="h-4 w-4 mr-2" />
+                {t("persona_card.delete_button", "Delete")}
+              </>
             )}
-            {isDeleting ? t("persona_card.deleting") : t("persona_card.delete_button")}
           </Button>
-
         </div>
-        {persona.status !== 'ready' && (
-          <p className="text-xs text-center text-orange-500 mt-3">
-            {t("persona_card.actions_disabled_prefix")} **{persona.status.toUpperCase()}**{t("persona_card.actions_disabled_suffix")}.
+
+        <Button
+          onClick={() => navigate(`/persona/${persona.id}/dashboard`)}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm"
+        >
+          <Settings2 className="h-4 w-4 mr-2" />
+          Manage Settings
+        </Button>
+
+        {persona.status === 'failed' && (
+          <p className="text-[10px] text-destructive flex items-center justify-center gap-1 mt-2">
+            <AlertCircle size={12} /> Creation failed.
           </p>
         )}
       </CardContent>
