@@ -14,6 +14,7 @@ import PersonaDashboard from "./pages/PersonaDashboard"; // New Page
 import DigitalCopyPage from "./pages/DigitalCopy";
 import PersonaChatPage from "./pages/PersonaChat";
 import { AuthProvider, useAuth } from "./contexts/AuthProvider";
+import PublicChat from "@/pages/PublicChat.tsx";
 
 const queryClient = new QueryClient();
 
@@ -31,23 +32,34 @@ const App: React.FC = () => (
           <Toaster position="top-right" reverseOrder={false} />
           <ShadcnToaster />
           <Sonner />
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/persona/list" element={<ProtectedRoute><PersonaListPage /></ProtectedRoute>} />
 
-              {/* ⭐️ Unified Dashboard Route */}
-              <Route
-                path="/persona/:personaId/dashboard"
-                element={<ProtectedRoute><PersonaDashboard /></ProtectedRoute>}
-              />
+          <Routes>
+            {/* PUBLIC CHAT ROUTE (No Navbar) */}
+            <Route path="/p/:personaId" element={<PublicChat />} />
 
-              <Route path="/persona/:id/chat" element={<ProtectedRoute><PersonaChatPage /></ProtectedRoute>} />
-              <Route path="/admin/digital-copy" element={<ProtectedRoute><DigitalCopyPage /></ProtectedRoute>} />
-            </Routes>
-          </div>
+            {/* ALL OTHER ROUTES (With Navbar) */}
+            <Route
+              path="*"
+              element={
+                <div className="flex flex-col min-h-screen">
+                  <Navbar />
+                  <main className="flex-1">
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/persona/list" element={<ProtectedRoute><PersonaListPage /></ProtectedRoute>} />
+                      <Route
+                        path="/persona/:personaId/dashboard"
+                        element={<ProtectedRoute><PersonaDashboard /></ProtectedRoute>}
+                      />
+                      <Route path="/persona/:id/chat" element={<ProtectedRoute><PersonaChatPage /></ProtectedRoute>} />
+                      <Route path="/admin/digital-copy" element={<ProtectedRoute><DigitalCopyPage /></ProtectedRoute>} />
+                    </Routes>
+                  </main>
+                </div>
+              }
+            />
+          </Routes>
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>

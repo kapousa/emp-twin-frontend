@@ -57,7 +57,7 @@ const Navbar = () => {
                 </>
               ) : (
                 <Link
-                  to="/admin/login"
+                  to="/login"
                   className={cn(
                     "text-sm font-medium transition-colors hover:text-primary",
                     isActive("/admin/login")
