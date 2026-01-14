@@ -1,19 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import React, {useState, useEffect, useRef} from 'react';
+import {useParams} from 'react-router-dom';
 import axios from 'axios';
 import {
-  Loader2, Send, Bot, Sparkles, Paperclip, User,
-  Copy, FileText, Check, FileDown, X
+    Loader2, Send, Bot, Sparkles, Paperclip, User,
+    Copy, FileText, Check, FileDown, X
 } from 'lucide-react';
-import { getPublicPersonaEndpoint, getPublicChatEndpoint } from '@/configurations/api';
-import { toast } from 'react-hot-toast';
-import { jsPDF } from 'jspdf';
+import {getPublicPersonaEndpoint, getPublicChatEndpoint} from '@/configurations/api';
+import {toast} from 'react-hot-toast';
+import {jsPDF} from 'jspdf';
 
 const PublicChat = () => {
-    const { personaId } = useParams<{ personaId: string }>();
+    const {personaId} = useParams<{ personaId: string }>();
     const [persona, setPersona] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string, senderName?: string }[]>([]);
+    const [messages, setMessages] = useState<{
+        role: 'user' | 'assistant',
+        content: string,
+        senderName?: string
+    }[]>([]);
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
@@ -24,11 +28,27 @@ const PublicChat = () => {
     const scrollRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const exportMessageToPDF = (content: string, index: number) => {
+        const doc = new jsPDF();
+        const margin = 10;
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        // Split text to ensure it doesn't overflow the page width
+        const splitText = doc.splitTextToSize(content, pageWidth - margin * 2);
+
+        doc.setFontSize(16);
+        doc.text(`${persona?.personaName || 'Assistant'} Response`, margin, 20);
+        doc.setFontSize(12);
+        doc.text(splitText, margin, 35);
+
+        doc.save(`Response_${index + 1}.pdf`);
+        toast.success("PDF Downloaded");
+    };
+
     useEffect(() => {
         const loadInitialData = async () => {
             try {
                 const res = await axios.get(getPublicPersonaEndpoint(personaId!));
-                // Extracting the nested persona object that now includes avatar_url
                 const data = res.data.persona;
                 setPersona(data);
                 setActiveSessionId(res.data.session_id);
@@ -61,7 +81,10 @@ const PublicChat = () => {
         messages.forEach(m => {
             const name = m.role === 'user' ? 'You' : (m.senderName || 'Assistant');
             const lines = doc.splitTextToSize(`${name}: ${m.content}`, 180);
-            if (y + (lines.length * 7) > 280) { doc.addPage(); y = 20; }
+            if (y + (lines.length * 7) > 280) {
+                doc.addPage();
+                y = 20;
+            }
             doc.text(lines, 15, y);
             y += (lines.length * 7) + 5;
         });
@@ -72,7 +95,7 @@ const PublicChat = () => {
         const textToSend = overrideInput || input;
         if (!textToSend.trim() && !attachedFile) return;
 
-        setMessages(prev => [...prev, { role: 'user', content: textToSend }]);
+        setMessages(prev => [...prev, {role: 'user', content: textToSend}]);
         setInput("");
         setSuggestions([]);
         setIsTyping(true);
@@ -82,9 +105,8 @@ const PublicChat = () => {
             formData.append("query", textToSend);
             formData.append("session_id", activeSessionId || "");
 
-            // CRITICAL FIX: Map 'role' to 'sender' for backend rag_services.py compatibility
             const historyForBackend = messages.slice(-6).map(m => ({
-                sender: m.role, // Backend expects msg['sender']
+                sender: m.role,
                 content: m.content
             }));
             formData.append("chat_history", JSON.stringify(historyForBackend));
@@ -113,45 +135,38 @@ const PublicChat = () => {
         }
     };
 
-// In PublicChat.tsx
-const PersonaAvatar = ({ size = "w-6 h-6" }: { size?: string }) => {
-    // Standardize the backend URL
-    const BACKEND_URL = "http://localhost:8000";
+    const PersonaAvatar = ({size = "w-6 h-6"}: { size?: string }) => {
+        const BACKEND_URL = "http://localhost:8000";
+        const avatarUrl = persona?.avatar_url;
+        const fullSrc = avatarUrl
+            ? (avatarUrl.startsWith('http') ? avatarUrl : `${BACKEND_URL}${encodeURI(avatarUrl)}`)
+            : null;
 
-    // Use the same logic as PersonaCard: look for avatar_url
-    const avatarUrl = persona?.avatar_url;
+        return (
+            <div className={`${size} rounded-full bg-indigo-600 flex items-center justify-center overflow-hidden shrink-0 shadow-sm border border-indigo-100`}>
+                {fullSrc ? (
+                    <img
+                        src={fullSrc}
+                        alt={persona?.personaName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                ) : (
+                    <span className="text-white font-bold uppercase" style={{fontSize: '40%'}}>
+                        {persona?.personaName?.charAt(0) || 'P'}
+                    </span>
+                )}
+            </div>
+        );
+    };
 
-    // Construct full URL if it's a relative path
-    const fullSrc = avatarUrl
-        ? (avatarUrl.startsWith('http') ? avatarUrl : `${BACKEND_URL}${encodeURI(avatarUrl)}`)
-        : null;
-
-    return (
-        <div className={`${size} rounded-full bg-indigo-600 flex items-center justify-center overflow-hidden shrink-0 shadow-sm border border-indigo-100`}>
-            {fullSrc ? (
-                <img
-                    src={fullSrc}
-                    alt={persona?.personaName}
-                    className="w-full h-full object-cover"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-            ) : (
-                <span className="text-white font-bold uppercase" style={{ fontSize: '40%' }}>
-                    {persona?.personaName?.charAt(0) || 'P'}
-                </span>
-            )}
-        </div>
-    );
-};
-
-    if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin text-indigo-600" /></div>;
+    if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin text-indigo-600"/></div>;
 
     return (
         <div className="flex flex-col h-screen bg-white font-sans overflow-hidden">
-            {/* HEADER */}
             <header className="px-6 py-4 border-b bg-white flex justify-between items-center shadow-sm shrink-0">
                 <div className="flex items-center gap-3">
-                    <PersonaAvatar size="w-10 h-10" />
+                    <PersonaAvatar size="w-10 h-10"/>
                     <div>
                         <h2 className="font-bold text-gray-900 leading-tight">{persona?.personaName || "Assistant"}</h2>
                         <div className="flex items-center gap-1.5">
@@ -160,15 +175,15 @@ const PersonaAvatar = ({ size = "w-6 h-6" }: { size?: string }) => {
                         </div>
                     </div>
                 </div>
-                <button onClick={downloadFullChatPDF} className="p-2 hover:bg-gray-50 rounded-lg text-gray-500 border border-transparent hover:border-gray-200 transition-all">
-                    <FileDown size={20} />
+                <button onClick={downloadFullChatPDF} className="p-2 hover:bg-gray-50 rounded-lg text-gray-500 border border-transparent hover:border-gray-200 transition-all" title="Download Full History">
+                    <FileDown size={20}/>
                 </button>
             </header>
 
             <main ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-gray-50/20">
                 {messages.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center text-center opacity-20">
-                        <Bot size={48} className="mb-2" />
+                        <Bot size={48} className="mb-2"/>
                         <p className="text-sm font-medium">How can {persona?.personaName || "I"} help you today?</p>
                     </div>
                 )}
@@ -176,25 +191,41 @@ const PersonaAvatar = ({ size = "w-6 h-6" }: { size?: string }) => {
                     <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                         <div className="flex items-center gap-2 mb-1.5 px-1">
                             {m.role === 'user' ? (
-                                <><span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">You</span><div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center"><User size={10} className="text-gray-500" /></div></>
+                                <>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">You</span>
+                                    <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center"><User size={10} className="text-gray-500"/></div>
+                                </>
                             ) : (
-                                <><PersonaAvatar size="w-5 h-5" /><span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">{m.senderName || persona?.personaName}</span></>
+                                <>
+                                    <PersonaAvatar size="w-5 h-5"/>
+                                    <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">{m.senderName || persona?.personaName}</span>
+                                </>
                             )}
                         </div>
                         <div className={`group relative max-w-[85%] px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed shadow-sm border ${
                             m.role === 'user' ? 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none' : 'bg-white text-gray-800 border-gray-100 rounded-tl-none'
                         }`}>
                             {m.content}
-                            <button onClick={() => handleCopy(m.content, i)} className={`absolute top-0 ${m.role === 'user' ? 'right-full mr-2' : 'left-full ml-2'} opacity-0 group-hover:opacity-100 p-1.5 bg-white border rounded-md shadow-sm transition-opacity`}>
-                                {copiedIndex === i ? <Check size={14} className="text-green-500"/> : <Copy size={14} className="text-gray-400"/>}
-                            </button>
+
+                            {/* ACTION BUTTONS (Appear on Hover) */}
+                            <div className={`absolute top-0 ${m.role === 'user' ? 'right-full mr-2' : 'left-full ml-2'} flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
+                                <button onClick={() => handleCopy(m.content, i)} className="p-1.5 bg-white border rounded-md shadow-sm hover:text-indigo-600 transition-colors" title="Copy Message">
+                                    {copiedIndex === i ? <Check size={14} className="text-green-500"/> : <Copy size={14} className="text-gray-400"/>}
+                                </button>
+
+                                {m.role === 'assistant' && (
+                                    <button onClick={() => exportMessageToPDF(m.content, i)} className="p-1.5 bg-white border rounded-md shadow-sm hover:text-indigo-600 transition-colors" title="Export Answer to PDF">
+                                        <FileDown size={14} className="text-gray-400"/>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 ))}
                 {isTyping && (
                     <div className="flex flex-col items-start">
                         <div className="flex items-center gap-2 mb-1.5 px-1">
-                            <PersonaAvatar size="w-5 h-5" />
+                            <PersonaAvatar size="w-5 h-5"/>
                             <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Typing...</span>
                         </div>
                         <div className="bg-white border border-gray-100 px-4 py-3 rounded-2xl flex gap-1 shadow-sm">
@@ -212,7 +243,7 @@ const PersonaAvatar = ({ size = "w-6 h-6" }: { size?: string }) => {
                         <div className="flex flex-wrap gap-2">
                             {suggestions.map((s, idx) => (
                                 <button key={idx} onClick={() => handleSend(s)} className="text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1.5 rounded-full hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-1">
-                                    <Sparkles size={10} /> {s}
+                                    <Sparkles size={10}/> {s}
                                 </button>
                             ))}
                         </div>
@@ -227,13 +258,13 @@ const PersonaAvatar = ({ size = "w-6 h-6" }: { size?: string }) => {
                     )}
 
                     <div className="flex items-center gap-2">
-                        <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => setAttachedFile(e.target.files?.[0] || null)} />
+                        <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => setAttachedFile(e.target.files?.[0] || null)}/>
                         <button onClick={() => fileInputRef.current?.click()} className={`p-3 rounded-xl transition-colors ${attachedFile ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:bg-gray-100'}`}>
-                            <Paperclip size={20} />
+                            <Paperclip size={20}/>
                         </button>
                         <div className="relative flex-1">
-                            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder={`Message ${persona?.personaName || 'Persona'}...`} className="w-full py-3.5 pl-4 pr-12 bg-gray-50 border-none rounded-2xl outline-none text-sm font-medium focus:ring-2 focus:ring-indigo-100" />
-                            <button onClick={() => handleSend()} className="absolute right-1.5 top-1.5 p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95"><Send size={18} /></button>
+                            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder={`Message ${persona?.personaName || 'Persona'}...`} className="w-full py-3.5 pl-4 pr-12 bg-gray-50 border-none rounded-2xl outline-none text-sm font-medium focus:ring-2 focus:ring-indigo-100"/>
+                            <button onClick={() => handleSend()} className="absolute right-1.5 top-1.5 p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95"><Send size={18}/></button>
                         </div>
                     </div>
                 </div>
