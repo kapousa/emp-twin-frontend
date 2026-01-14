@@ -38,27 +38,29 @@ const App: React.FC = () => (
             <Route path="/p/:personaId" element={<PublicChat />} />
 
             {/* ALL OTHER ROUTES (With Navbar) */}
-            <Route
-              path="*"
-              element={
-                <div className="flex flex-col min-h-screen">
-                  <Navbar />
-                  <main className="flex-1">
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/persona/list" element={<ProtectedRoute><PersonaListPage /></ProtectedRoute>} />
-                      <Route
-                        path="/persona/:personaId/dashboard"
-                        element={<ProtectedRoute><PersonaDashboard /></ProtectedRoute>}
-                      />
-                      <Route path="/persona/:id/chat" element={<ProtectedRoute><PersonaChatPage /></ProtectedRoute>} />
-                      <Route path="/admin/digital-copy" element={<ProtectedRoute><DigitalCopyPage /></ProtectedRoute>} />
-                    </Routes>
-                  </main>
-                </div>
-              }
-            />
+            {/* ALL OTHER ROUTES (With Sidebar Navbar) */}
+<Route
+  path="*"
+  element={
+    <div className="flex h-screen w-full bg-white overflow-hidden">
+      <Navbar /> {/* Sidebar fixed on the left */}
+
+      <main className="flex-1 h-full overflow-y-auto bg-gray-50/30">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/persona/list" element={<ProtectedRoute><PersonaListPage /></ProtectedRoute>} />
+          <Route
+            path="/persona/:personaId/dashboard"
+            element={<ProtectedRoute><PersonaDashboard /></ProtectedRoute>}
+          />
+          <Route path="/persona/:id/chat" element={<ProtectedRoute><PersonaChatPage /></ProtectedRoute>} />
+          <Route path="/admin/digital-copy" element={<ProtectedRoute><DigitalCopyPage /></ProtectedRoute>} />
+        </Routes>
+      </main>
+    </div>
+  }
+/>
           </Routes>
         </BrowserRouter>
       </AuthProvider>
