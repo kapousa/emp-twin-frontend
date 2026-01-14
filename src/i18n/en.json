@@ -1,5 +1,5 @@
 {
-  "homeTitle": "Project X",
+  "homeTitle": "Croconus",
   "hero": {
     "title": "Scale your unique expertise with Croconus",
     "description": "Create a Digital Copy that learns your knowledge, style, and memory, making your insights available 24/7. Delegate tasks to an AI that truly thinks like you, freeing you to achieve more while ensuring your professional wisdom is always at hand, never forgotten."
@@ -21,6 +21,9 @@
       "title": "Expert Support",
       "description": "Professional responses from business experts"
     }
+  },
+  "common": {
+    "back_home": "Back to home"
   },
   "featureCards": {
     "askQuestions": {
@@ -56,7 +59,9 @@
     "email_placeholder": "admin@croconile.ai",
     "password_label": "Password",
     "sign_in": "Sign In",
-    "signing_in": "Signing in..."
+    "signing_in": "Signing in...",
+    "no_account": "You don't have an account?",
+    "signup_link": "Sign Up"
   },
   "toast": {
     "missing_credentials": {
