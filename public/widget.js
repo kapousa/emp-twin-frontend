@@ -1,7 +1,7 @@
 (function() {
   const scriptTag = document.currentScript;
   const personaId = scriptTag.getAttribute('data-id');
-  const baseUrl = "http://localhost:8080/p";
+  const baseUrl = "http://localhost:8080/p/public";
 
   if (!personaId) return;
 

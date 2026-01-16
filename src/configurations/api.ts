@@ -31,10 +31,21 @@ export const getPersonaDeleteEndpoint = (personaId: string): string => `${PERSON
 export const getPersonaChatEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/chat`;
 export const getPersonaAnswerEndpoint = (personaId: string): string => `${PERSONA_ENDPOINT}/${personaId}/ask`;
 export const getUpdatePersonaSettingsEndpoint = (personaId: string) => `${PERSONA_ENDPOINT}/${personaId}/settings`;
+
 // Public Persona API's
 export const PUBLIC_PERSONA_ENDPOINT: string = `${API_BASE_URL}/public`;
-export const getPublicPersonaEndpoint = (personaId: string): string => `${PUBLIC_PERSONA_ENDPOINT}/persona/${personaId}`;
-export const getPublicChatEndpoint = (personaId: string): string => `${PUBLIC_PERSONA_ENDPOINT}/persona/${personaId}/chat`;
+export const getPublicPersonaEndpoint = (personaId: string): string =>
+  `${PUBLIC_PERSONA_ENDPOINT}/persona/${personaId}`;
+export const getPublicChatEndpoint = (personaId: string): string =>
+  `${PUBLIC_PERSONA_ENDPOINT}/persona/${personaId}/chat`;
+
+// BOARDROOM ENDPOINTS
+export const ROOM_ENDPOINT: string = `${API_BASE_URL}/room`;
+export const ROOM_CREATE_ENDPOINT: string = `${ROOM_ENDPOINT}/create`;
+export const ROOM_LIST_ENDPOINT: string = `${ROOM_ENDPOINT}/list`;
+export const getRoomDetailsEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}`;
+export const getRoomChatEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/chat`;
+export const getRoomDeleteEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/delete`;
 
 // Persona knowlege files APIs
 export const getKnowledgeResourcesEndpoint = (personaId: string): string =>  `${PERSONA_ENDPOINT}/${personaId}/knowledge`;

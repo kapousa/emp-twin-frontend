@@ -49,7 +49,8 @@
     "resources_link": "Resources",
     "control_panel_link": "Control Panel",
     "digital_copy_link": "Digital Copies",
-    "ask_faleh_link": "Ask Crocuns"
+    "ask_faleh_link": "Ask Crocuns",
+    "boardrooms_link": "Boardrooms"
   },
   "login": {
     "title": "Login",

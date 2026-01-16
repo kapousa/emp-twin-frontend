@@ -148,7 +148,8 @@ const handleSubmit = useCallback(async (e: React.FormEvent, generateVideoOption:
             headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
         });
 
-        const { answer, video_url, suggestions } = response.data;
+        const answer = response.data.answer || response.data.reply;
+const { video_url, suggestions } = response.data;
 
         setMessages((prev) => {
             const historyWithoutThinking = prev.filter(m => m.id !== "thinking");

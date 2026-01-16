@@ -3,20 +3,27 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { Home, UserCircle, Settings, LogOut, MessageSquare } from "lucide-react";
+import {
+  Home,
+  UserCircle,
+  Settings,
+  LogOut,
+  MessageSquare,
+  Users // Added Users icon for Boardrooms
+} from "lucide-react";
 import CroconusLogo from "@/assets/croconus_logo.png";
 
 const Navbar = () => {
   const { t } = useTranslation();
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate(); // For redirecting after logout
+  const navigate = useNavigate();
 
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
-    logout(); // Clears the token/auth state
-    navigate("/login"); // Forces the browser to the login page
+    logout();
+    navigate("/login");
   };
 
   if (!isAuthenticated) return null;
@@ -33,7 +40,6 @@ const Navbar = () => {
 
       {/* Navigation Links */}
       <div className="flex-1 px-4 space-y-2">
-        {/* HOME LINK - Red Theme */}
         <Link
           to="/"
           className={cn(
@@ -46,7 +52,6 @@ const Navbar = () => {
           <Home size={18} /> {t("navbar.home") || "Home"}
         </Link>
 
-        {/* DIGITAL COPY LINK - Red Theme */}
         <Link
           to="/persona/list"
           className={cn(
@@ -56,45 +61,34 @@ const Navbar = () => {
               : "text-gray-500 hover:bg-red-50 hover:text-[#E11D48]"
           )}
         >
-          <UserCircle size={18} /> {t("navbar.digital_copy_link")}
+          <UserCircle size={18} /> {t("navbar.digital_copy_link") || "Digital Copy"}
         </Link>
 
-        {/* CONTROL PANEL LINK - Red Theme */}
+        {/* ⭐️ NEW: BOARDROOMS LINK */}
         <Link
-          to="/controlpanel"
+          to="/room/list"
           className={cn(
             "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all",
-            isActive("/controlpanel")
+            isActive("/room/list") || location.pathname.startsWith("/room")
               ? "bg-[#E11D48] text-white shadow-lg shadow-red-100"
               : "text-gray-500 hover:bg-red-50 hover:text-[#E11D48]"
           )}
         >
-          <Settings size={18} /> {t("navbar.control_panel_link")}
+          <Users size={18} /> {t("navbar.boardrooms_link") || "Boardrooms"}
         </Link>
 
-        <div className="pt-4 mt-4 border-t border-gray-50">
-          <Link
-            to="/ask"
-            className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-black transition-all",
-                isActive("/ask")
-                ? "bg-[#E11D48] text-white"
-                : "text-[#E11D48] bg-red-50 hover:bg-red-100"
-            )}
-          >
-            <MessageSquare size={18} /> {t("navbar.ask_faleh_link")}
-          </Link>
-        </div>
+
+
       </div>
 
       {/* Footer Section */}
       <div className="p-4 border-t border-gray-50 space-y-4">
         <LanguageSwitcher />
         <button
-          onClick={handleLogout} // Updated handler
+          onClick={handleLogout}
           className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-gray-400 hover:text-[#E11D48] hover:bg-red-50 rounded-xl transition-all"
         >
-          <LogOut size={18} /> {t("navbar.logout_button")}
+          <LogOut size={18} /> {t("navbar.logout_button") || "Logout"}
         </button>
       </div>
     </nav>
