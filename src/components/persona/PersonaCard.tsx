@@ -110,7 +110,7 @@ const PersonaCard = ({ persona, onDelete, isDeleting }: PersonaCardProps) => {
           className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm"
         >
           <Settings2 className="h-4 w-4 mr-2" />
-          Manage Settings
+          Manage Persona
         </Button>
 
         {persona.status === 'failed' && (

@@ -75,6 +75,8 @@ const App: React.FC = () => (
                                                    element={<ProtectedRoute><RoomCreation/></ProtectedRoute>}/>
                                             <Route path="/room/:roomId"
                                                    element={<ProtectedRoute><RoomDetails/></ProtectedRoute>}/>
+                                            <Route path="/room/:roomId/start"
+                                                   element={<ProtectedRoute><RoomChat/></ProtectedRoute>}/>
                                         </Routes>
                                     </main>
                                 </div>

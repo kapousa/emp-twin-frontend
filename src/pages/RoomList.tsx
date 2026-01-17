@@ -96,7 +96,7 @@ const fetchRooms = async () => {
           {rooms.map((room) => (
             <Link
               key={room.id}
-              to={`/rooms/${room.id}`}
+              to={`/room/${room.id}/start`}
               className="group bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all relative overflow-hidden"
             >
               <div className="flex justify-between items-start mb-4">

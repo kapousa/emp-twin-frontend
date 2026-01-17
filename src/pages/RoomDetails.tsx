@@ -52,7 +52,7 @@ const RoomDetails = () => {
           </p>
         </section>
         <button
-  onClick={() => navigate(`/room/${roomId}/chat`)}
+  onClick={() => navigate(`/room/${roomId}/start  `)}
   className="w-full py-6 bg-[#E11D48] text-white rounded-[32px] font-black flex items-center justify-center gap-3 shadow-xl shadow-red-100 hover:scale-[1.02] transition-all"
 >
   <Play size={20} fill="currentColor" />

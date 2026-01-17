@@ -44,6 +44,7 @@ export const ROOM_ENDPOINT: string = `${API_BASE_URL}/room`;
 export const ROOM_CREATE_ENDPOINT: string = `${ROOM_ENDPOINT}/create`;
 export const ROOM_LIST_ENDPOINT: string = `${ROOM_ENDPOINT}/list`;
 export const getRoomDetailsEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}`;
+export const getRoomStartMeetingEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/start_metting`;
 export const getRoomChatEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/chat`;
 export const getRoomDeleteEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/delete`;
 
