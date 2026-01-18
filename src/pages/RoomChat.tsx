@@ -1,244 +1,174 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {useParams} from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import {Send, Users, Info, Loader2, Bot, ChevronLeft, Sparkles} from 'lucide-react';
-import {useAuth} from '@/contexts/AuthProvider';
-import { getRoomChatEndpoint, API_BASE_URL } from '@/configurations/api';
+import { Send, Users, Loader2, ChevronLeft, Copy, FileText, Download, ClipboardList, Check, UserCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthProvider';
+import { API_BASE_URL } from '@/configurations/api';
+import jsPDF from 'jspdf';
 
 const RoomChat = () => {
-    const {roomId} = useParams();
-    const {token} = useAuth();
-
-    // State for room details
+    const { roomId } = useParams();
+    const { token } = useAuth();
     const [room, setRoom] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
+    const [copyId, setCopyId] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
 
+    // Initial Meeting Start Logic
     useEffect(() => {
-    // Only trigger if room is loaded, we have members, and no messages yet
-    if (room && messages.length === 0) {
-        const initialPrompt = `
-            The boardroom meeting has started. 
-            Topic: ${room.topic || "General Discussion"}
-            Agenda: ${room.agenda || "Introduce yourselves and provide expert feedback."}
-            
-            Please provide your initial thoughts on this topic and agenda based on any documents provided.
-        `;
+        if (room && messages.length === 0 && !isTyping) {
+            const initialPrompt = `Boardroom meeting started. Topic: ${room.topic}. Agenda: ${room.agenda}. Expert introduce yourselves and provide feedback.`;
+            handleSend(initialPrompt);
+        }
+    }, [room]);
 
-        handleSend(initialPrompt);
-    }
-}, [room]);
+    // Helper Functions
+    const copyToClipboard = (text: string, id: string) => {
+        navigator.clipboard.writeText(text);
+        setCopyId(id);
+        setTimeout(() => setCopyId(null), 2000);
+    };
+
+    const exportMessageToPDF = (sender: string, content: string) => {
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text(`Response from: ${sender}`, 10, 20);
+        doc.setFontSize(12);
+        const splitText = doc.splitTextToSize(content, 180);
+        doc.text(splitText, 10, 30);
+        doc.save(`${sender}_response.pdf`);
+    };
+
+    const exportFullChatToPDF = () => {
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text(`Meeting Transcript: ${room?.room_name}`, 10, 20);
+        doc.setFontSize(12);
+        let yPos = 30;
+        messages.forEach((msg) => {
+            const text = `${msg.sender_name || 'AI'}: ${msg.content}`;
+            const lines = doc.splitTextToSize(text, 180);
+            if (yPos + lines.length * 7 > 280) { doc.addPage(); yPos = 20; }
+            doc.text(lines, 10, yPos);
+            yPos += lines.length * 7 + 5;
+        });
+        doc.save(`Meeting_Transcript.pdf`);
+    };
+
+    const generateMinutes = () => {
+        handleSend("Please summarize our meeting so far, listing key decisions and action items as 'MINUTES OF MEETING'.");
+    };
+
+    const handleSend = async (overrideInput?: string) => {
+        const textToSend = overrideInput || input;
+        if (!textToSend.trim()) return;
+        if (!overrideInput) {
+            setMessages(prev => [...prev, { role: "user", content: textToSend, sender_name: "You" }]);
+            setInput("");
+        }
+        setIsTyping(true);
+        try {
+            const res = await axios.post(`${API_BASE_URL}/room/${roomId}/chat`, {
+                query: textToSend,
+                history: messages.map(m => ({ role: m.role, content: m.content, sender_name: m.sender_name }))
+            }, { headers: { Authorization: `Bearer ${token}` } });
+            if (res.data.responses) setMessages(prev => [...prev, ...res.data.responses]);
+        } catch (err) { console.error(err); } finally { setIsTyping(false); }
+    };
 
     useEffect(() => {
         const fetchRoomDetails = async () => {
             try {
                 setLoading(true);
-                // Using the endpoint defined in your router: /room/{room_id}/start_meeting
                 const res = await axios.get(`${API_BASE_URL}/room/${roomId}/start_meeting`, {
-                    headers: {Authorization: `Bearer ${token}`}
+                    headers: { Authorization: `Bearer ${token}` }
                 });
-
-                // This will contain: { room_name, topic, members: [...] }
                 setRoom(res.data);
-            } catch (err) {
-                console.error("Error fetching room details:", err);
-            } finally {
-                setLoading(false);
-            }
+            } catch (err) { console.error(err); } finally { setLoading(false); }
         };
-
-        if (roomId && token) {
-            fetchRoomDetails();
-        }
+        if (roomId && token) fetchRoomDetails();
     }, [roomId, token]);
 
-    useEffect(() => {
-        scrollRef.current?.scrollIntoView({behavior: 'smooth'});
-    }, [messages, isTyping]);
-
-
-const handleSend = async (overrideInput?: string) => {
-    const queryText = overrideInput || input;
-    if (!queryText.trim()) return;
-
-    // Only show the message in the UI if it came from the user typing,
-    // not the hidden initial system prompt.
-    if (!overrideInput) {
-        const userMsg = { role: 'user', content: queryText, sender_name: 'You' };
-        setMessages(prev => [...prev, userMsg]);
-        setInput("");
-    }
-
-    setIsTyping(true);
-
-    try {
-        const res = await axios.post(getRoomChatEndpoint(roomId!), {
-            query: queryText,
-            history: messages // This passes the context to the RAG service
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (res.data.responses) {
-            setMessages(prev => [...prev, ...res.data.responses]);
-        }
-    } catch (err) {
-        console.error("Chat error:", err);
-    } finally {
-        setIsTyping(false);
-    }
-};
-
-    if (loading) {
-        return (
-            <div className="h-screen flex items-center justify-center">
-                <Loader2 className="animate-spin text-rose-500" size={32}/>
-            </div>
-        );
-    }
+    useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, isTyping]);
 
     return (
         <div className="flex flex-col h-screen bg-gray-50">
-            {/* Dynamic Header */}
-            <header className="bg-white border-b p-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => window.history.back()}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                        <ChevronLeft size={20} className="text-gray-500"/>
-                    </button>
-                    <div>
-  <h1 className="text-lg font-bold text-gray-900 leading-tight">
-    {room?.room_name || "Boardroom Session"}
-  </h1>
-  <div className="flex flex-col gap-0.5 mt-1">
-    <p className="text-xs text-gray-500 flex items-center gap-1 font-semibold">
-      <Sparkles size={12} className="text-rose-500" />
-      Topic: {room?.topic || "Not set"}
-    </p>
-    {room?.agenda && (
-       <p className="text-[10px] text-gray-400 flex items-center gap-1 italic">
-         <Info size={10} /> Agenda: {room.agenda}
-       </p>
-    )}
-  </div>
-</div>
+            {/* Header */}
+            <div className="bg-white border-b px-6 py-4 flex flex-col gap-4 sticky top-0 z-10 shadow-sm">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <button onClick={() => window.history.back()} className="p-2 hover:bg-gray-100 rounded-full">
+                            <ChevronLeft size={20} className="text-gray-600" />
+                        </button>
+                        <div>
+                            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                <Users className="text-rose-600" size={20} />
+                                {room?.room_name || "Boardroom"}
+                            </h1>
+                            <p className="text-xs text-gray-400 italic">{room?.topic}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button onClick={generateMinutes} className="flex items-center gap-2 px-3 py-2 bg-rose-50 text-rose-700 rounded-lg hover:bg-rose-100 text-sm font-semibold">
+                            <ClipboardList size={16} /> Minutes
+                        </button>
+                        <button onClick={exportFullChatToPDF} className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-semibold">
+                            <Download size={16} /> Export All
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-  {/* 1. THE AVATAR STACK WITH BOTTOM TOOLTIPS */}
-  <div className="flex -space-x-3">
-    {room?.members?.map((member: any, i: number) => {
-      const baseUrl = API_BASE_URL.replace(/\/$/, '');
-
-      // Safety URL construction matching PersonaCard
-      const fileName = member.avatar_url?.split('/').pop();
-      const fullUrl = fileName ? `${baseUrl}/static/avatars/${fileName}` : null;
-
-      return (
-        <div
-          key={i}
-          className="group relative w-10 h-10 rounded-full border-2 border-white bg-indigo-600 flex items-center justify-center text-[11px] font-bold text-white shadow-sm transition-all hover:scale-110 hover:z-50 cursor-pointer"
-          style={{ zIndex: 10 - i }}
-        >
-          {/* THE TOOLTIP - NOW POSITIONED AT THE BOTTOM */}
-          <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 hidden group-hover:block z-[100] min-w-[140px] pointer-events-none">
-            <div className="bg-gray-900/95 backdrop-blur-sm text-white p-2.5 rounded-xl shadow-2xl text-center border border-white/10">
-              <p className="text-[11px] font-bold whitespace-nowrap">{member.persona_name}</p>
-              <p className="text-[9px] text-indigo-300 whitespace-nowrap leading-none mt-1 font-bold uppercase tracking-wider">
-                {member.persona_role}
-              </p>
-
-              {/* Tooltip Arrow (Pointing Up) */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-8 border-transparent border-b-gray-900/95" />
-            </div>
-          </div>
-
-          {fullUrl ? (
-            <img
-              src={fullUrl}
-              alt={member.persona_name}
-              className="w-full h-full object-cover rounded-full"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const parent = e.currentTarget.parentElement;
-                if (parent) parent.innerText = member.persona_name?.charAt(0) || 'E';
-              }}
-            />
-          ) : (
-            <span>{member.persona_name?.charAt(0) || 'E'}</span>
-          )}
-        </div>
-      );
-    })}
-  </div>
-
-  {/* 2. MEMBER COUNT BUTTON */}
-  <button className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-gray-800 transition-all shadow-md flex-shrink-0">
-    <Users size={14} />
-    <span>{room?.members?.length || 0} Board Members</span>
-  </button>
-</div>
-            </header>
-
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full opacity-40">
-                        <Bot size={48} className="mb-4"/>
-                        <p className="font-bold">The board is ready for your input.</p>
-                    </div>
-                )}
-
-                {messages.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] rounded-2xl p-4 ${
-                            msg.role === 'user'
-                                ? 'bg-rose-600 text-white rounded-tr-none'
-                                : 'bg-white border border-gray-100 shadow-sm rounded-tl-none'
-                        }`}>
-                            {msg.role !== 'user' && (
-                                <p className="text-[10px] font-black text-rose-600 uppercase mb-1">{msg.sender_name}</p>
+                {/* RESTORED: Meeting Members List */}
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
+                    <span className="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Active Board:</span>
+                    {room?.members?.map((member: any, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2 bg-white border border-gray-100 px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap">
+                            {member.avatar_url ? (
+                                <img src={`${API_BASE_URL}${member.avatar_url}`} alt="" className="w-6 h-6 rounded-full object-cover border border-rose-100" />
+                            ) : (
+                                <UserCircle size={20} className="text-gray-300" />
                             )}
-                            <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
+                            <div className="flex flex-col">
+                                <span className="text-[11px] font-bold text-gray-800 leading-none">{member.persona_name}</span>
+                                <span className="text-[9px] text-rose-500 font-medium uppercase tracking-tighter">{member.persona_role}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Chat Area */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {messages.map((msg, idx) => (
+                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group`}>
+                        <div className={`max-w-[80%] flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                            <span className="text-[10px] font-bold text-gray-400 mb-1 uppercase tracking-widest px-1">{msg.sender_name}</span>
+                            <div className={`relative p-4 rounded-2xl border ${msg.role === 'user' ? 'bg-rose-600 text-white border-rose-500 rounded-tr-none' : 'bg-white text-gray-800 border-gray-100 rounded-tl-none shadow-sm'}`}>
+                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                <div className={`absolute -bottom-8 ${msg.role === 'user' ? 'right-0' : 'left-0'} flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-md border rounded-lg p-1 z-20`}>
+                                    <button onClick={() => copyToClipboard(msg.content, `msg-${idx}`)} className="p-1 hover:bg-gray-100 rounded text-gray-500">
+                                        {copyId === `msg-${idx}` ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+                                    </button>
+                                    <button onClick={() => exportMessageToPDF(msg.sender_name, msg.content)} className="p-1 hover:bg-gray-100 rounded text-gray-500">
+                                        <FileText size={14} />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ))}
-                {isTyping && (
-                    <div className="flex items-center gap-2 text-xs text-gray-400 animate-pulse font-bold">
-                        <Loader2 size={12} className="animate-spin"/>
-                        The Board is deliberating...
-                    </div>
-                )}
-                <div ref={scrollRef}/>
+                {isTyping && <div className="text-xs text-gray-400 animate-pulse font-bold flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> Board Deliberating...</div>}
+                <div ref={scrollRef} />
             </div>
 
             {/* Input Area */}
             <div className="p-6 bg-white border-t">
-                <div
-                    className="max-w-4xl mx-auto flex gap-4 bg-gray-50 p-2 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-rose-100 transition-all">
-          <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                  }
-              }}
-              placeholder="Address the board..."
-              className="flex-1 bg-transparent p-3 outline-none resize-none font-medium text-sm"
-              rows={1}
-          />
-                    <button
-                        onClick={handleSend}
-                        className="bg-rose-600 text-white p-3 rounded-xl hover:bg-rose-700 transition-colors shadow-lg shadow-rose-200"
-                    >
-                        <Send size={18}/>
-                    </button>
+                <div className="max-w-4xl mx-auto flex gap-4 bg-gray-50 p-2 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-rose-100 transition-all">
+                    <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }} placeholder="Address the board..." className="flex-1 bg-transparent p-3 outline-none resize-none font-medium text-sm" rows={1} />
+                    <button onClick={() => handleSend()} className="bg-rose-600 text-white p-3 rounded-xl hover:bg-rose-700 shadow-lg shadow-rose-200 transition-all"><Send size={18} /></button>
                 </div>
             </div>
         </div>
