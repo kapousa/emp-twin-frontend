@@ -23,7 +23,8 @@ interface SessionHistoryPanelProps {
     onNewSession: () => void;
     onSessionSelect: (sessionId: string) => void;
     // Props passed from PersonaChatPage
-    t: (key: string) => string; 
+    t: (key: string) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     toast: any;
 }
 

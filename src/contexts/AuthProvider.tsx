@@ -1,7 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 import { AUTH_VERIFY_ENDPOINT } from "@/configurations/api";
+
+// Define custom interface to fix the "email" property error
+interface CustomJwtPayload extends JwtPayload {
+  email?: string;
+}
 
 const AuthContext = createContext(null);
 
@@ -23,7 +28,9 @@ export const AuthProvider = ({ children }) => {
         await axios.get(AUTH_VERIFY_ENDPOINT, {
           headers: { "Authorization": `Bearer ${token}` },
         });
-        const decodedToken = jwtDecode(token);
+
+        // Cast to CustomJwtPayload
+        const decodedToken = jwtDecode<CustomJwtPayload>(token);
         setUser({ email: decodedToken.email });
         setIsAuthenticated(true);
       } catch (error) {
@@ -40,10 +47,10 @@ export const AuthProvider = ({ children }) => {
     verifyAuth();
   }, [token]);
 
-  const login = (newToken) => {
+  const login = (newToken: string) => {
     localStorage.setItem("authToken", newToken);
-    setToken(newToken); // ✅ keep it in state
-    const decodedToken = jwtDecode(newToken);
+    setToken(newToken);
+    const decodedToken = jwtDecode<CustomJwtPayload>(newToken);
     setUser({ email: decodedToken.email });
     setIsAuthenticated(true);
   };

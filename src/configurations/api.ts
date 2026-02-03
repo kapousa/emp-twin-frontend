@@ -44,9 +44,11 @@ export const ROOM_ENDPOINT: string = `${API_BASE_URL}/room`;
 export const ROOM_CREATE_ENDPOINT: string = `${ROOM_ENDPOINT}/create`;
 export const ROOM_LIST_ENDPOINT: string = `${ROOM_ENDPOINT}/list`;
 export const getRoomDetailsEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}`;
-export const getRoomStartMeetingEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/start_metting`;
-export const getRoomChatEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/chat`;
+export const getRoomStartMeetingEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/start_meeting`;
+export const getRoomChatEndpoint = (roomId: string, session_id: string): string => `${ROOM_ENDPOINT}/${roomId}/${session_id}/chat`;
 export const getRoomDeleteEndpoint = (roomId: string): string => `${ROOM_ENDPOINT}/${roomId}/delete`;
+export const generateRoomReportEndpoint = (roomId: string, sessionId: string): string =>
+    `${ROOM_ENDPOINT}/${roomId}/${sessionId}/boardreport`;
 
 // Persona knowlege files APIs
 export const getKnowledgeResourcesEndpoint = (personaId: string): string =>  `${PERSONA_ENDPOINT}/${personaId}/knowledge`;
