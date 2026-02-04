@@ -6,7 +6,7 @@ import {
   Trash2,
   Loader2,
   Settings2,
-  AlertCircle
+  AlertCircle, Edit
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
@@ -109,8 +109,8 @@ const PersonaCard = ({ persona, onDelete, isDeleting }: PersonaCardProps) => {
           onClick={() => navigate(`/persona/${persona.id}/dashboard`)}
           className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm"
         >
-          <Settings2 className="h-4 w-4 mr-2" />
-          Manage Persona
+          <Edit className="h-4 w-4 mr-2" />
+          Edit Persona
         </Button>
 
         {persona.status === 'failed' && (

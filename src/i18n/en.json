@@ -291,8 +291,6 @@
       "knowledge_text_description": "Provide core information about the persona, what it knows, and its background."
     }
   },
-
-
   "personachat": {
     "ask_persona_link": "Ask Persona",
     "tone_label": "Persona Tone",
@@ -345,10 +343,9 @@
   "Generate Resume": "Generate Resume",
   "Generate Intro Video": "Generate Intro Video",
   "Reply to my today's Emails": "Reply to my today's Emails",
-  "Send message to freind": "Send message to freind",
-
+  "Send message to freind": "Send message to friend",
   "sessionslist": {
-    "header": "Chats"
+    "header": "Chats",
+    "no_sessions": ""
   }
-
 }
