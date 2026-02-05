@@ -6,7 +6,7 @@ import { PERSONA_BUILD_ENDPOINT } from "@/configurations/api";
 
 const PERSONA_BUILD_ENDPOINT_URL = `${PERSONA_BUILD_ENDPOINT}`;
 
-const DigitalCopyPage = () => {
+const CreatePersonaPage = () => {
   const { t } = useTranslation();
 
   // Define handleBuildSubmit INSIDE the component
@@ -99,4 +99,4 @@ const DigitalCopyPage = () => {
   );
 };
 
-export default DigitalCopyPage;
+export default CreatePersonaPage;

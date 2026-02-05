@@ -48,7 +48,7 @@
     "ask_persona_link": "Ask Persona",
     "resources_link": "Resources",
     "control_panel_link": "Control Panel",
-    "digital_copy_link": "Digital Copies",
+    "digital_copy_link": "Personas",
     "ask_faleh_link": "Ask Crocuns",
     "boardrooms_link": "Boardrooms"
   },
@@ -151,10 +151,10 @@
   },
   "admin": {
     "personas": {
-      "title": "Digital Copies List",
-      "header": "Your Digital Copies",
+      "title": "Personas List",
+      "header": "Personas",
       "description": "Manage and interact with all your created AI personas.",
-      "new_button": "Create New Copy",
+      "new_button": "Create New Persona",
       "empty_state_message": "You haven't created any Digital Copies yet.",
       "empty_state_button": "Start Building One",
       "loading": "Loading Digital Copies...",
@@ -188,7 +188,7 @@
     "deleting": "Deleting"
   },
   "digital_copy": {
-    "title": "Create Your Digital Copy",
+    "title": "Create New Persona",
     "description": "Follow the steps to define the identity, knowledge, and style for your AI persona.",
     "note": "The process uses Ollama and Mistral to create a dedicated RAG-powered agent.",
     "auth_error": "You are not authenticated. Please log in to create a digital copy.",

@@ -11,7 +11,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import PersonaListPage from "./pages/PersonaList";
 import PersonaDashboard from "./pages/PersonaDashboard";
-import DigitalCopyPage from "./pages/DigitalCopy";
+import CreatePersonaPage from "./pages/CreatePersona.tsx";
 import PersonaChatPage from "./pages/PersonaChat";
 import {AuthProvider, useAuth} from "./contexts/AuthProvider";
 import PublicChat from "@/pages/PublicChat.tsx";
@@ -21,6 +21,8 @@ import RoomCreation from "./pages/RoomCreation";
 import RoomChat from "./pages/RoomChat";
 import RoomList from "./pages/RoomList";
 import RoomDetails from "@/pages/RoomDetails.tsx";
+import PersonaEdit from "@/pages/PersonaEdit.tsx";
+import CreatePersona from "@/pages/CreatePersona.tsx";
 
 const queryClient = new QueryClient();
 
@@ -58,10 +60,16 @@ const App: React.FC = () => (
                                             <Route path="/login" element={<Login/>}/>
 
                                             {/* Standard Persona Management */}
+                                            <Route path="/persona/new"
+                                                   element={<ProtectedRoute><CreatePersona/></ProtectedRoute>}/>
                                             <Route path="/persona/list"
                                                    element={<ProtectedRoute><PersonaListPage/></ProtectedRoute>}/>
                                             <Route
                                                 path="/persona/:personaId/dashboard"
+                                                element={<ProtectedRoute><PersonaEdit/></ProtectedRoute>}
+                                            />
+                                            <Route
+                                                path="/persona/:personaId/advancedsettings"
                                                 element={<ProtectedRoute><PersonaDashboard/></ProtectedRoute>}
                                             />
                                             {/* This version has the sidebar */}

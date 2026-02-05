@@ -9,6 +9,7 @@ import {
 } from '@/configurations/api';
 import { Save, Zap, ShieldCheck, Share2, Copy, Globe, Loader2, Info, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import PersonaEditComponent from '@/components/persona/PersonaEdit';
 
 const PersonaSettings = () => {
   const { personaId } = useParams<{ personaId: string }>();

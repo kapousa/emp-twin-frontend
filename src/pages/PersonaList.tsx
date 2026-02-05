@@ -159,11 +159,11 @@ const PersonaListPage = () => {
       </h1>
       <p className="text-muted-foreground mt-1">{t("admin.personas.description")}</p>
     </div>
-    <Link to="/admin/digital-copy">
-      <Button size="lg" className="shadow-lg">
-        {t("admin.personas.new_button")}
-      </Button>
-    </Link>
+    <Link to="/persona/new">
+  <Button size="lg" className="shadow-lg">
+    {t("admin.personas.new_button")}
+  </Button>
+</Link>
   </div>
 
 {/* Persona Grid - Updated to show exactly 3 columns on large screens */}
