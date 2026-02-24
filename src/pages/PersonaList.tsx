@@ -170,7 +170,7 @@ const PersonaListPage = () => {
   {personas.length === 0 ? (
     <div className="text-center p-20 border-2 border-dashed border-border rounded-xl mt-10">
       <p className="text-xl text-muted-foreground">{t("admin.personas.empty_state_message")}</p>
-      <Link to="/admin/digital-copy">
+      <Link to="/persona/new">
         <Button className="mt-6 text-lg">{t("admin.personas.empty_state_button")}</Button>
       </Link>
     </div>
