@@ -33,7 +33,7 @@ const PersonaDashboard = () => {
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
-      <Link to="/persona/list" className="flex items-center text-indigo-600 mb-6 hover:underline font-medium">
+      <Link to="/persona/list" className="flex items-center text-red-600 mb-6 hover:underline font-medium">
         <ChevronLeft size={18} /> Back to Personas
       </Link>
 
@@ -60,7 +60,7 @@ const PersonaDashboard = () => {
             {persona?.persona_name || "Loading..."}
           </h1>
           <div className="flex items-center gap-2 mt-1">
-             <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-bold rounded uppercase tracking-wider">
+             <span className="px-2 py-0.5 bg-indigo-100 text-red-600 text-xs font-bold rounded uppercase tracking-wider">
                {persona?.persona_role || "Persona"}
              </span>
              <span className="text-gray-400 text-sm">•</span>
@@ -74,7 +74,7 @@ const PersonaDashboard = () => {
         <button
           onClick={() => setActiveTab('knowledge')}
           className={`pb-4 px-2 flex items-center gap-2 font-bold transition-all ${
-            activeTab === 'knowledge' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-400 hover:text-gray-600'
+            activeTab === 'knowledge' ? 'border-b-2 border-black text-black' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
           <Database size={18} /> Knowledge Base
