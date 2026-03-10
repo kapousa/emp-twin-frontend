@@ -64,7 +64,7 @@ const Navbar = () => {
         <NavItem
           to="/"
           icon={<Home size={20} />}
-          label={t("navbar.home_link") || "Home"}
+          label={t("navbar.home") || "Home"}
           isActive={isActive("/")}
           isCollapsed={isCollapsed}
         />
@@ -99,7 +99,7 @@ const Navbar = () => {
           title={isCollapsed ? "Logout" : ""}
         >
           <LogOut size={20} />
-          {!isCollapsed && <span>{t("navbar.logout_link") || "Logout"}</span>}
+          {!isCollapsed && <span>{t("navbar.logout_button") || "Logout"}</span>}
         </button>
       </div>
     </nav>

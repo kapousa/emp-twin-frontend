@@ -1,7 +1,7 @@
 // src/pages/PersonaListPage.tsx (UPDATED)
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Loader2, Brain } from 'lucide-react';
+import {Loader2, Brain, UserCircle} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import PersonaCard from '@/components/persona/PersonaCard';
 import { Button } from '@/components/ui/button';
@@ -154,7 +154,7 @@ const PersonaListPage = () => {
   <div className="flex justify-between items-center mb-10 border-b pb-4">
     <div>
       <h1 className="text-3xl font-bold text-foreground">
-        <Brain className="h-8 w-8 inline mr-3 text-primary" />
+        <UserCircle className="h-8 w-8 inline mr-3 text-primary" />
         {t("admin.personas.header")}
       </h1>
       <p className="text-muted-foreground mt-1">{t("admin.personas.description")}</p>
