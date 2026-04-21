@@ -16,7 +16,7 @@ interface Persona {
   id: string;
   persona_name: string;
   persona_role: string;
-  avatar_url: string | null;
+  avatarPath: string | null;
   status: 'queued' | 'processing' | 'ready' | 'failed';
 }
 
@@ -49,9 +49,9 @@ const PersonaCard = ({ persona, onDelete, isDeleting }: PersonaCardProps) => {
       {/* ⭐️ Updated Header: Vertical layout with centered content */}
       <CardHeader className="pb-4 pt-8 flex flex-col items-center text-center">
         <div className="relative mb-4">
-          {persona.avatar_url ? (
+          {persona.avatarPath ? (
             <img
-              src={persona.avatar_url}
+              src={persona.avatarPath}
               alt={displayName}
               className="w-24 h-24 rounded-full object-cover border-4 border-muted shadow-sm"
             />

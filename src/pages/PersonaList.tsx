@@ -17,7 +17,7 @@ interface Persona {
   id: string;
   personaName: string;
   personaRole: string;
-  avatar_url: string | null;
+  avatarPath: string | null;
   status: 'queued' | 'processing' | 'ready' | 'failed';
 }
 

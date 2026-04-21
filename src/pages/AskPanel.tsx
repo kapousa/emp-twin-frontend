@@ -314,7 +314,7 @@ const AskPanel = () => {
                   <Checkbox
                     id="generate-video"
                     checked={generateVideo}
-                    onCheckedChange={setGenerateVideo}
+                    onCheckedChange={() => handleCheckboxChange(generateVideo)}
                     disabled={isSubmitting}
                   />
                   <Label htmlFor="generate-video">{t("askpanel.generate_video_label")}</Label> {/* Translated */}

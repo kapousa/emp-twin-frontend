@@ -51,7 +51,7 @@ const PersonaEdit = () => {
             });
 
             if (data.avatar_url) {
-                setPreviewUrl(data.avatar_url);
+                setPreviewUrl(data.avatarPath);
             }
         } catch (error) {
             toast.error("Failed to load details");
