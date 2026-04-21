@@ -29,7 +29,7 @@ interface FullPersonaDetails {
     persona_name: string;
     persona_role: string;
     persona_tone: string;
-    avatar_url: string | null;
+    avatarPath: string | null;
 }
 
 const getQueryParam = (location: any, param: string): string | null => {

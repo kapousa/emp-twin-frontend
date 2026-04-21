@@ -14,7 +14,7 @@ interface FullPersonaDetails {
   persona_role: string;
   persona_tone: string;
   knowledge_text: string;
-  avatar_url: string | null;
+  avatarPath: string | null;
   status: "queued" | "processing" | "ready" | "failed";
   user_id: string;
   created_at: string;
@@ -111,7 +111,7 @@ const ChatMessagesDisplay = ({
             {/* Attractive Persona Header */}
             {persona && (
                 <div className="flex items-center p-4 border-b bg-card/50 shadow-sm sticky top-0 z-10">
-                    <PersonaAvatar avatarUrl={persona.avatar_url} name={persona.persona_name} />
+                    <PersonaAvatar avatarUrl={persona.avatarPath} name={persona.persona_name} />
                     <div className="ml-4 flex-1 min-w-0">
                         <h2 className="text-xl font-bold text-foreground truncate">{persona.persona_name}</h2>
                         <div className="flex items-center space-x-3 text-sm text-muted-foreground mt-0.5">
@@ -140,8 +140,8 @@ const ChatMessagesDisplay = ({
                     messages.map((msg) => (
                         <div key={msg.id} className={`flex items-start gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                             {msg.sender === "bot" && (
-                                persona?.avatar_url ? (
-                                    <img src={persona.avatar_url} alt="Bot Avatar" className="h-8 w-8 rounded-full object-cover mt-1" />
+                                persona?.avatarPath ? (
+                                    <img src={persona.avatarPath} alt="Bot Avatar" className="h-8 w-8 rounded-full object-cover mt-1" />
                                 ) : (
                                     <Bot className="h-8 w-8 text-primary mt-1" />
                                 )

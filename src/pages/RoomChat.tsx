@@ -218,8 +218,8 @@ const handleGenerateReport = async () => {
                         {msg.role !== 'user' && (
                             <div
                                 className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 border flex-shrink-0 shadow-sm">
-                                {msg.avatar_url ? (
-                                    <img src={`${BASE_URL}${msg.avatar_url}`} alt={msg.sender_name}
+                                {msg.avatarPath ? (
+                                    <img src={`${BASE_URL}${msg.avatarPath}`} alt={msg.sender_name}
                                          className="w-full h-full object-cover"/>
                                 ) : (
                                     <UserCircle className="w-full h-full text-gray-400"/>

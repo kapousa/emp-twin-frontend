@@ -94,9 +94,9 @@ const ChatBox: React.FC<ChatBoxProps> = (props) => {
             {/* --- NEW HEADER SECTION --- */}
             <div className="p-4 border-b bg-card flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {persona?.avatar_url ? (
+                    {persona?.avatarPath ? (
                         <img
-                            src={persona.avatar_url}
+                            src={persona.avatarPath}
                             alt={persona.persona_name}
                             className="h-10 w-10 rounded-full object-cover border"
                         />

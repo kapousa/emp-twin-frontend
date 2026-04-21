@@ -24,7 +24,7 @@ interface FullPersonaDetails {
     persona_role: string;
     persona_tone: string;
     knowledge_text: string;
-    avatar_url: string | null;
+    avatarPath: string | null;
     status: "queued" | "processing" | "ready" | "failed";
     user_id: string;
     created_at: string;

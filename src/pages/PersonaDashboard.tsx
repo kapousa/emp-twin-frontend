@@ -29,7 +29,7 @@ const PersonaDashboard = () => {
   }, [personaId, token]);
 
   // Determine the avatar source
-  const avatarSource = persona?.avatar_url || persona?.avatar;
+  const avatarSource = persona?.avatarPath || persona?.avatar;
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">

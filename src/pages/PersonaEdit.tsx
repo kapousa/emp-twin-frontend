@@ -50,7 +50,7 @@ const PersonaEdit = () => {
                 avatarFile: null
             });
 
-            if (data.avatar_url) {
+            if (data.avatarPath) {
                 setPreviewUrl(data.avatarPath);
             }
         } catch (error) {

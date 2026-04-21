@@ -113,9 +113,9 @@ const PublicChat = ({ isEmbed = false }: PublicChatProps) => {
                 <div className="flex items-center gap-3">
                     {/* AVATAR WITH INITIALS FALLBACK */}
                     <div className={`${isEmbed ? 'w-10 h-10' : 'w-11 h-11'} bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 font-bold overflow-hidden border border-gray-100 flex-shrink-0`}>
-                        {persona?.avatar_url ? (
+                        {persona?.avatarPath ? (
                             <img
-                                src={`${cleanBaseUrl}${persona.avatar_url}`}
+                                src={`${cleanBaseUrl}${persona.avatarPath}`}
                                 alt={persona.personaName}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {

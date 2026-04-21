@@ -173,13 +173,13 @@ const RoomCreation = () => {
                                             isSelected ? 'border-[#E11D48] bg-red-50' : 'border-gray-50 bg-white hover:border-gray-200'
                                         }`}
                                     >
-                                        {/* AVATAR FIX: Check for avatar_url first */}
+                                        {/* AVATAR FIX: Check for avatarPath first */}
                                         <div
                                             className={`w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center font-black text-white ${
                                                 isSelected ? 'bg-[#E11D48]' : 'bg-gray-200'
                                             }`}>
-                                            {p.avatar_url ? (
-                                                <img src={p.avatar_url} alt={name}
+                                            {p.avatarPath ? (
+                                                <img src={p.avatarPath} alt={name}
                                                      className="w-full h-full object-cover"/>
                                             ) : (
                                                 <span>{name.charAt(0).toUpperCase()}</span>
