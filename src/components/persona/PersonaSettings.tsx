@@ -93,7 +93,7 @@ const PersonaSettings = () => {
     }
   };
 
-  const publicLink = `${currentOrigin}/p/${personaId}`;
+  const publicLink = `${currentOrigin}/p/public/${personaId}`;
   const embedCode = `<script src="${currentOrigin}/widget.js" data-id="${personaId}" defer></script>`;
 
   return (
