@@ -188,6 +188,31 @@ const ChatBox: React.FC<ChatBoxProps> = (props) => {
                 )}
 
                 <form onSubmit={(e) => handleSubmit(e, generateVideo)} className="relative bg-muted/50 border rounded-xl p-2 focus-within:ring-1 focus-within:ring-primary/20">
+                    {/* --- ADD THIS: File Preview Chips --- */}
+{props.files.length > 0 && (
+    <div className="flex flex-wrap gap-2 mb-2 px-2">
+        {props.files.map((file, index) => (
+            <div
+                key={index}
+                className="flex items-center gap-2 bg-background border rounded-md px-2 py-1 text-xs"
+            >
+                <FileText className="h-3 w-3 text-primary" />
+                <span className="truncate max-w-[150px]">{file.name}</span>
+                <button
+                    type="button"
+                    onClick={() => {
+                        const newFiles = [...props.files];
+                        newFiles.splice(index, 1);
+                        props.setFiles(newFiles);
+                    }}
+                    className="hover:text-destructive transition-colors"
+                >
+                    <X className="h-3 w-3" />
+                </button>
+            </div>
+        ))}
+    </div>
+)}
                     <Textarea
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
