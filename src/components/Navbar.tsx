@@ -35,7 +35,7 @@ const Navbar = () => {
   return (
     <nav
       className={cn(
-        "h-screen bg-slate-950 border-r border-white/5 flex flex-col shrink-0 sticky top-0 transition-all duration-300 ease-in-out relative z-50",
+        "h-screen bg-background border-r border-border flex flex-col shrink-0 sticky top-0 transition-all duration-300 ease-in-out relative z-50",
         isCollapsed ? "w-20" : "w-64"
       )}
     >
@@ -52,7 +52,7 @@ const Navbar = () => {
         <Link to="/" className="flex items-center space-x-3">
           <img src={CroconusLogo} alt="Logo" className="h-8 w-auto min-w-[32px]" />
           {!isCollapsed && (
-            <span className="text-xl font-black tracking-tighter text-white animate-in fade-in duration-500">
+            <span className="text-xl tracking-tighter animate-in fade-in duration-500">
               Croconus
             </span>
           )}
@@ -87,7 +87,7 @@ const Navbar = () => {
       </div>
 
       {/* Footer Section */}
-      <div className={cn("p-4 border-t border-white/5 space-y-4", isCollapsed ? "flex flex-col items-center" : "")}>
+      <div className={cn("p-4 border-t border-border space-y-4", isCollapsed ? "flex flex-col items-center" : "")}>
         {!isCollapsed && <LanguageSwitcher />}
 
         <button
@@ -115,7 +115,7 @@ const NavItem = ({ to, icon, label, isActive, isCollapsed }: any) => (
       "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all relative group",
       isActive
         ? "bg-primary text-white shadow-lg shadow-primary/20"
-        : "text-slate-400 hover:bg-white/5 hover:text-slate-100",
+        : "text-slate-400 hover:bg-accent hover:text-slate-100",
       isCollapsed ? "justify-center px-0 mx-2" : ""
     )}
   >
