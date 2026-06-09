@@ -32,7 +32,7 @@ const Home = () => {
               {/* SIGN UP BUTTON - Primary Red Style */}
               <Link
                 to="/signup"
-                className="group flex items-center gap-3 px-8 py-4 bg-[#E11D48] text-white text-lg font-black rounded-2xl shadow-xl shadow-red-100 hover:scale-105 transition-all"
+                className="group flex items-center gap-3 px-8 py-4 bg-[#7c80f3] text-white text-lg font-black rounded-2xl shadow-xl shadow-violet-400-100 hover:scale-105 transition-all"
               >
                 <UserPlus size={20} />
                 {t("login.signup_link") || "Create Account"}
@@ -42,7 +42,7 @@ const Home = () => {
               {/* SIGN IN BUTTON - Secondary Style */}
               <Link
                 to="/login"
-                className="group flex items-center gap-3 px-8 py-4 bg-white text-gray-900 border-2 border-gray-100 text-lg font-black rounded-2xl hover:border-[#E11D48] hover:text-[#E11D48] transition-all shadow-sm"
+                className="group flex items-center gap-3 px-8 py-4 bg-white text-gray-900 border-2 border-gray-100 text-lg font-black rounded-2xl hover:border-[#7c80f3] hover:text-[#7c80f3] transition-all shadow-sm"
               >
                 <LogIn size={20} />
                 {t("login.title") || "Sign In"}
@@ -64,7 +64,7 @@ const Home = () => {
         {/* Features Section */}
         <div className="mt-24">
           <div className="text-center mb-12">
-            <h2 className="text-sm font-black text-[#E11D48] uppercase tracking-[0.2em] mb-3">
+            <h2 className="text-sm font-black text-[#7c80f3] uppercase tracking-[0.2em] mb-3">
               Core Capabilities
             </h2>
             <p className="text-gray-400 font-medium">Everything you need to manage your digital twin.</p>

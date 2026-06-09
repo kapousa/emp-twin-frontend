@@ -1,6 +1,6 @@
 (function() {
   const scriptTag = document.currentScript;
-  const personaId = scriptTag.getAttribute('data-id');
+    const personaId = scriptTag.getAttribute('data-id');
 
   // IMPORTANT: Ensure this URL points to your actual backend API/Persona route
   // If your persona chat is at /p/public/[id], this should be the base.
@@ -40,7 +40,7 @@
   });
 
   const nameLabel = document.createElement('span');
-  nameLabel.innerText = 'Croconus Digital Twin';
+  nameLabel.innerText = 'Powered By Croconus';
   Object.assign(nameLabel.style, {
     color: 'white', fontFamily: 'sans-serif', fontWeight: '700', fontSize: '15px'
   });
@@ -58,6 +58,7 @@
   const iframe = document.createElement('iframe');
   // Construct the URL. ?embed=true can be used by your backend to hide headers/footers
   iframe.src = `${baseUrl}/${personaId}?embed=true`;
+  //iframe.src = `${baseUrl}/api/v1/chat?embed=true`
   Object.assign(iframe.style, { width: '100%', height: 'calc(100% - 60px)', border: 'none' });
 
   container.appendChild(header);
