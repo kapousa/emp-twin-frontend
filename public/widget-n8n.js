@@ -3,7 +3,6 @@
   const personaId = scriptTag.getAttribute('data-id');
 
   // ── CONFIGURE THIS ──────────────────────────────────────────────────────────
-  // Your n8n Chat Trigger webhook URL (copy from the "When chat message received" node)
   const N8N_WEBHOOK_URL = scriptTag.getAttribute('data-webhook') || "http://localhost:5678/webhook/1ca35cf4-f9af-46cb-a188-56032c2bd1ff/chat";
   // ────────────────────────────────────────────────────────────────────────────
 
@@ -48,6 +47,11 @@
       display: block; margin-top: 10px; padding: 8px 12px; color: white;
       text-decoration: none; text-align: center; border-radius: 6px;
       font-size: 12px; font-weight: 600; cursor: pointer; border: none; width: 100%; box-sizing: border-box;
+    }
+    .br-rich-card {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+      padding: 12px; margin-top: 10px; display: flex; flex-direction: column;
+      gap: 10px; width: 100%; box-sizing: border-box;
     }
   `;
   document.head.appendChild(style);
@@ -121,16 +125,10 @@
   }
 
   // ── PARSE N8N RESPONSE ───────────────────────────────────────────────────────
-  // n8n Chat Trigger returns: { output: "...", sessionId: "..." }
-  // Side-effect webhook returns: { type, message, downloadUrl, actionLink, emailRecipient }
   function parseN8nResponse(data) {
-    // Handle array responses (n8n sometimes wraps in array)
     const d = Array.isArray(data) ? data[0] : data;
-
-    // Get the main text — n8n Chat Trigger always puts it in `output`
     const rawText = d.output || d.message || d.text || d.chatInput || '';
 
-    // Strip any leftover action tags (safety net)
     const cleanText = rawText
       .replace(/\[GENERATE_DOC\]/gi, '')
       .replace(/\[SEND_EMAIL:[^\]]+\]/gi, '')
@@ -138,13 +136,30 @@
       .replace(/\[COLLECT_WHATSAPP\]/gi, '')
       .replace(/\[WHATSAPP:[^\]]+\]/gi, '')
       .replace(/\[BOOK_APPOINTMENT\]/gi, '')
+      .replace(/\[COMMAND_TAG_NONE\]/gi, '')
+      .replace(/\[COMMAND TAG\]/gi, '')
+      .replace(/COMMAND TAGS:\s*$/gi, '')
       .trim();
+
+    let actionLink = d.actionLink || null;
+    let type = d.type || 'chat';
+
+    // ── AUTOMATIC FALLBACK SAFETY ────────────────────────────────────────────
+    // If n8n output text mentions your main website link but has no actionLink object,
+    // we auto-generate it right here so you don't have to worry about backend formats.
+    if (!actionLink && cleanText.toLowerCase().includes('blackrockrealestate.com')) {
+      actionLink = {
+        label: "Visit Our Website",
+        url: "https://blackrockrealestate.com"
+      };
+    }
 
     return {
       text:          cleanText,
-      type:          d.type || 'chat',
-      downloadUrl:   d.downloadUrl   || null,
-      actionLink:    d.actionLink    || null,   // { label, url }
+      type:          type,
+      intent:        d.intent || (actionLink ? 'website' : null),
+      downloadUrl:   d.downloadUrl || null,
+      actionLink:    actionLink,
       emailRecipient: d.emailRecipient || null,
     };
   }
@@ -160,7 +175,6 @@
       fontSize: '13.5px', lineHeight: '1.45', whiteSpace: 'pre-wrap',
     });
 
-    // User bubble
     if (isUser) {
       bubble.style.cssText += ';background:#c89a4d;color:white;border-bottom-right-radius:4px;box-shadow:0 2px 4px rgba(200,154,77,0.15)';
       bubble.innerText = typeof parsed === 'string' ? parsed : parsed.text;
@@ -170,12 +184,53 @@
       return;
     }
 
-    // Agent bubble
     bubble.style.cssText += ';background:white;color:#334155;border:1px solid #e2e8f0;border-bottom-left-radius:4px';
     const p = typeof parsed === 'string' ? { text: parsed, type: 'chat' } : parsed;
     bubble.innerText = p.text;
 
-    // ── COLLECT EMAIL: show inline email input ───────────────────────────────
+    // ── CASE 1: PORTFOLIO / DOCUMENT PREVIEW CARD ────────────────────────────
+    if (p.type === 'document' && p.downloadUrl) {
+      const docCard = document.createElement('div');
+      docCard.className = 'br-rich-card';
+      docCard.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">📄</span>
+          <div style="flex: 1;">
+            <div style="color: #1e293b; font-weight: 600; font-size: 13px;">Property Portfolio</div>
+            <div style="color: #64748b; font-size: 11px;">Custom Real Estate Overview.pdf</div>
+          </div>
+        </div>
+        <a href="${p.downloadUrl}" target="_blank" class="br-action-link" style="background-color: #10b981; margin-top: 4px;">Open & Download Portfolio</a>
+      `;
+      bubble.appendChild(docCard);
+    }
+
+    // ── CASE 2: WEBSITE PREVIEW CARD ─────────────────────────────────────────
+    else if (p.actionLink && p.actionLink.url && p.actionLink.url !== '#') {
+      const isWebsite = p.intent === 'website' || p.actionLink.url.includes('blackrockrealestate');
+      const cardTitle = isWebsite ? 'Black Rock Real Estate' : (p.actionLink.label || 'External Link');
+      const cardSubtitle = isWebsite ? 'Explore residential & commercial listings' : 'Click below to navigate';
+      const cardColor = isWebsite ? '#1f2937' : '#c89a4d';
+      const cardIcon = isWebsite ? '🌐' : '🔗';
+
+      const webCard = document.createElement('div');
+      webCard.className = 'br-rich-card';
+      webCard.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">${cardIcon}</span>
+          <div style="flex: 1;">
+            <div style="color: #1e293b; font-weight: 600; font-size: 13px;">${cardTitle}</div>
+            <div style="color: #64748b; font-size: 11px;">${cardSubtitle}</div>
+          </div>
+        </div>
+        <a href="${p.actionLink.url}" target="_blank" class="br-action-link" style="background-color: ${cardColor}; margin-top: 4px;">
+          ${isWebsite ? 'Visit Our Website' : (p.actionLink.label || 'Open Link')}
+        </a>
+      `;
+      bubble.appendChild(webCard);
+    }
+
+    // ── CORE INTERACTIVE CONTEXT FORMS ───────────────────────────────────────
     if (p.type === 'collect_email') {
       const form = document.createElement('div');
       form.className = 'br-custom-form';
@@ -186,12 +241,11 @@
         const val = form.querySelector('#br-email-input').value.trim();
         if (!val) return;
         form.innerHTML = `<div style="color:#10b981;font-size:12px;font-weight:600;">✅ Email noted: ${val}</div>`;
-        sendMessage(val); // send email back as next message
+        sendMessage(val);
       };
       bubble.appendChild(form);
     }
 
-    // ── COLLECT WHATSAPP: show phone input ───────────────────────────────────
     else if (p.type === 'collect_whatsapp') {
       const form = document.createElement('div');
       form.className = 'br-custom-form';
@@ -207,7 +261,6 @@
       bubble.appendChild(form);
     }
 
-    // ── APPOINTMENT: show booking form ───────────────────────────────────────
     else if (p.type === 'appointment' || (p.actionLink && p.actionLink.url && p.actionLink.url.includes('calendly'))) {
       const form = document.createElement('div');
       form.className = 'br-custom-form';
@@ -225,7 +278,6 @@
       bubble.appendChild(form);
     }
 
-    // ── WHATSAPP LINK ────────────────────────────────────────────────────────
     else if (p.type === 'whatsapp' && p.actionLink) {
       const btn = document.createElement('a');
       btn.href = p.actionLink.url; btn.target = '_blank';
@@ -235,17 +287,6 @@
       bubble.appendChild(btn);
     }
 
-    // ── DOCUMENT DOWNLOAD ────────────────────────────────────────────────────
-    else if (p.type === 'document' && p.downloadUrl) {
-      const btn = document.createElement('a');
-      btn.href = p.downloadUrl; btn.target = '_blank';
-      btn.className = 'br-action-link';
-      btn.style.backgroundColor = '#10b981';
-      btn.innerText = '📄 Download Document';
-      bubble.appendChild(btn);
-    }
-
-    // ── EMAIL CONFIRMATION ───────────────────────────────────────────────────
     else if (p.type === 'email' && p.emailRecipient) {
       const note = document.createElement('div');
       note.style.cssText = 'margin-top:8px;padding:6px 10px;background:#f0fdf4;border-radius:6px;font-size:11.5px;color:#16a34a;font-weight:600';
@@ -253,25 +294,13 @@
       bubble.appendChild(note);
     }
 
-    // ── GENERIC ACTION LINK (appointment URL in text, etc.) ──────────────────
-    else if (p.actionLink && p.actionLink.url && p.actionLink.url !== '#') {
-      const btn = document.createElement('a');
-      btn.href = p.actionLink.url; btn.target = '_blank';
-      btn.className = 'br-action-link';
-      btn.style.backgroundColor = '#c89a4d';
-      btn.innerText = p.actionLink.label || '🔗 Open Link';
-      bubble.appendChild(btn);
-    }
-
     wrap.appendChild(bubble);
     msgArea.appendChild(wrap);
     msgArea.scrollTop = msgArea.scrollHeight;
   }
 
-  // Welcome message
   addMessage({ text: "Hello! How can I assist you with Black Rock Real Estate today?", type: 'chat' }, false);
 
-  // ── INPUT BAR ────────────────────────────────────────────────────────────────
   const inputForm = document.createElement('form');
   Object.assign(inputForm.style, {
     display: 'flex', padding: '12px 14px', background: 'white',
@@ -296,7 +325,6 @@
   document.body.appendChild(launcher);
   document.body.appendChild(container);
 
-  // ── SEND MESSAGE ─────────────────────────────────────────────────────────────
   async function sendMessage(text) {
     if (!text) return;
     chatInput.disabled = true;
@@ -335,7 +363,6 @@
     sendMessage(text);
   };
 
-  // ── TOGGLE ───────────────────────────────────────────────────────────────────
   const toggle = (show) => {
     if (show) {
       container.style.display = 'flex';
